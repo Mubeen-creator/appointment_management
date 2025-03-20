@@ -1,64 +1,40 @@
 import { NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 
-export async function POST(request: Request) {
+export async function POST(req: Request) {
   try {
-    const { to, subject, text, appointmentData } = await request.json();
-    console.log("Email Payload:", { to, subject, text, appointmentData });
+    // Only require "to", "subject", and "text" for testing
+    const { to, subject, text } = await req.json();
 
-    // Configure Brevo SMTP
+    console.log("[Email API] Sending test email to:", to); // Debugging log
+
     const transporter = nodemailer.createTransport({
-      host: "smtp-relay.brevo.com",
-      port: 587,
-      secure: false,
+      service: "gmail",
       auth: {
-        user: process.env.BREVO_EMAIL,
-        pass: process.env.BREVO_SMTP_KEY,
+        user: process.env.EMAIL_USER, // Ensure this is correct
+        pass: process.env.EMAIL_PASS, // Ensure this is correct
       },
     });
 
-    console.log("Brevo Email Config:", {
-      user: process.env.BREVO_EMAIL,
-      pass: "Hidden for security",
-    });
-
-    // HTML email template
-    const htmlContent = `
-      <h3>Appointment Request</h3>
-      <p>${text.replace(/\n/g, "<br>")}</p>
-      <div>
-        <a href="${process.env.BASE_URL}/api/accept?appointmentId=${
-      appointmentData?.id
-    }">Accept</a>
-        <a href="${process.env.BASE_URL}/api/reject?appointmentData=${
-      appointmentData?.id
-    }">Reject</a>
-        <a href="${process.env.BASE_URL}/api/pending?appointmentData=${
-      appointmentData?.id
-    }">Mark as Pending</a>
-      </div>
-    `;
-
     const mailOptions = {
-      from: `Appointment Management <${process.env.BREVO_EMAIL}>`,
+      from: process.env.EMAIL_USER,
       to,
       subject,
       text,
-      html: htmlContent,
     };
 
-    console.log("Sending email with options:", mailOptions);
-
-    // Send email and log result
     const info = await transporter.sendMail(mailOptions);
-    console.log("Email sent successfully:", info);
+    console.log("[Email API] Email sent successfully:", info.response);
 
     return NextResponse.json(
-      { message: "Email sent successfully" },
+      { message: "Email sent successfully!" },
       { status: 200 }
     );
-  } catch (error: any) {
-    console.error("Error in /api/send-email:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error) {
+    console.error("[Email API] Error sending email:", error);
+    return NextResponse.json(
+      { message: "Failed to send email", error },
+      { status: 500 }
+    );
   }
 }

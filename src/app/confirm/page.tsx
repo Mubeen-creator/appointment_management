@@ -28,57 +28,95 @@ export default function ConfirmMeeting() {
   );
 
   const handleConfirm = async () => {
-    console.log("handleConfirm triggered"); // Add this
+    console.log(
+      "[Frontend] handleConfirm triggered at",
+      new Date().toISOString()
+    );
+
     try {
-      // Save appointment to database
-      const appointmentResponse = await fetch("/api/appointments", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          requesterEmail: user.email,
-          hostEmail: email,
-          date,
-          time,
-          message: notes,
-        }),
+      // Validate required fields
+      console.log("[Frontend] Validating input fields:", {
+        userEmail: user?.email,
+        hostEmail: email,
+        date,
+        time,
+        name,
       });
 
-      const appointmentData = await appointmentResponse.json();
-      console.log("Appointment Data:", appointmentData);
-
-      if (!appointmentResponse.ok) {
-        alert(`Failed to save appointment: ${appointmentData.message}`);
+      if (!user?.email || !email || !date || !time || !name) {
+        alert("Please fill all required fields");
         return;
       }
 
-      // Send email with appointment ID
-      console.log("Sending email to:", email);
-      const emailResponse = await fetch("/api/send-email", {
+      console.log("[Frontend] Starting appointment creation...");
+
+      // Create appointment
+      const appointmentResponse = await fetch(
+        `/api/appointments`, // Use absolute URL with correct port
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            requesterEmail: user.email,
+            hostEmail: email,
+            date,
+            time,
+            message: notes,
+          }),
+        }
+      );
+
+      console.log("[Frontend] Appointment response:", appointmentResponse);
+
+      if (!appointmentResponse.ok) {
+        const error = await appointmentResponse.text(); // Use text() to capture non-JSON responses
+        console.error("[Frontend] Appointment error:", error);
+        alert(`Appointment failed: ${error}`);
+        return;
+      }
+
+      const appointmentData = await appointmentResponse.json();
+      console.log("[Frontend] Appointment created:", appointmentData);
+
+      // Convert MongoDB ObjectId to string for email payload
+      appointmentData.id = appointmentData.id.toString();
+
+      // Prepare email payload
+      const emailPayload = {
+        to: email,
+        subject: `New Appointment Request from ${name}`,
+        text: `Hi there,\n\n${name} has requested an appointment on ${date} at ${time}.\n\nMessage: ${notes}`,
+        appointmentData,
+      };
+
+      console.log("[Frontend] Sending email with payload:", emailPayload);
+
+      // Send email
+      const emailResponse = await fetch(`/api/send-email`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          to: email,
-          subject: "Appointment Request",
-          text: `New appointment request from ${name}`,
-          appointmentData, // Ensure this contains valid data
-        }),
+        body: JSON.stringify(emailPayload),
       });
 
-      console.log("Email Response Status:", emailResponse.status);
-      console.log("Email Response OK?", emailResponse.ok);
+      console.log("[Frontend] Email response status:", emailResponse.status);
 
-      if (emailResponse.ok) {
-        console.log("Email sent successfully");
-        dispatch(addAppointmentToHistory());
-        router.push("/meeting-confirmation");
-      } else {
-        const emailError = await emailResponse.json();
-        console.error("Email Error:", emailError);
-        alert(`Failed to send email: ${emailError.error || "Unknown error"}`);
+      if (!emailResponse.ok) {
+        const errorBody = await emailResponse.text();
+        console.error("[Frontend] Email error response:", errorBody);
+        alert(`Email failed: ${errorBody}`);
+        return;
       }
-    } catch (error) {
-      console.error("Confirmation error:", error);
-      alert("Error scheduling appointment");
+
+      console.log("[Frontend] Email sent successfully");
+      dispatch(addAppointmentToHistory());
+      router.push("/meeting-confirmation");
+    } catch (error: any) {
+      console.error("[Frontend] Full error details:", {
+        message: error.message,
+        stack: error.stack,
+        error: error,
+      });
+      alert("An unexpected error occurred. Please check the console.");
     }
   };
 

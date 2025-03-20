@@ -1,40 +1,70 @@
 import { NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 204,
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "POST, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type",
+    },
+  });
+}
+
 export async function POST(req: Request) {
   try {
-    // Only require "to", "subject", and "text" for testing
-    const { to, subject, text } = await req.json();
+    const body = await req.json(); // Axios sends JSON by default
+    const { to, subject, text, appointmentData } = body;
 
-    console.log("[Email API] Sending test email to:", to); // Debugging log
+    console.log("[Backend] Received email request:", body); // Debugging log
 
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
-        user: process.env.EMAIL_USER, // Ensure this is correct
-        pass: process.env.EMAIL_PASS, // Ensure this is correct
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
       },
     });
+
+    const emailContent = `
+      Subject: ${subject}
+      Requester Email: ${appointmentData.requesterEmail}
+      Host Email: ${appointmentData.hostEmail}
+      Date: ${appointmentData.date}
+      Time: ${appointmentData.time}
+      Message: ${appointmentData.message}
+    `;
 
     const mailOptions = {
       from: process.env.EMAIL_USER,
       to,
       subject,
-      text,
+      text: emailContent,
     };
 
     const info = await transporter.sendMail(mailOptions);
-    console.log("[Email API] Email sent successfully:", info.response);
+    console.log("[Backend] Email sent successfully:", info.response);
 
-    return NextResponse.json(
-      { message: "Email sent successfully!" },
-      { status: 200 }
+    return new NextResponse(
+      JSON.stringify({ message: "Email sent successfully!" }),
+      {
+        status: 200,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+        },
+      }
     );
   } catch (error) {
-    console.error("[Email API] Error sending email:", error);
-    return NextResponse.json(
-      { message: "Failed to send email", error },
-      { status: 500 }
+    console.error("[Backend] Error sending email:", error);
+    return new NextResponse(
+      JSON.stringify({ message: "Failed to send email", error }),
+      {
+        status: 500,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+        },
+      }
     );
   }
 }

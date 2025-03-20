@@ -1,11 +1,10 @@
-// store/slices/appointmentSlice.ts
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface Appointment {
   date: string;
   time: string;
-  name: string;
-  email: string;
+  requesterEmail: string;
+  hostEmail: string;
   message: string;
   status: "pending" | "accepted" | "rejected";
 }
@@ -19,8 +18,8 @@ const initialState: AppointmentState = {
   currentAppointment: {
     date: "",
     time: "",
-    name: "",
-    email: "",
+    requesterEmail: "",
+    hostEmail: "",
     message: "",
     status: "pending",
   },
@@ -36,28 +35,28 @@ const appointmentSlice = createSlice({
       action: PayloadAction<{
         date: string;
         time: string;
-        name: string;
-        email: string;
+        requesterEmail: string;
+        hostEmail: string;
         message: string;
       }>
     ) => {
-      // Update the current appointment
       state.currentAppointment = {
-        ...action.payload,
+        date: action.payload.date,
+        time: action.payload.time,
+        requesterEmail: action.payload.requesterEmail,
+        hostEmail: action.payload.hostEmail,
+        message: action.payload.message,
         status: "pending",
       };
     },
     addAppointmentToHistory: (state) => {
-      // Add the current appointment to the history
       state.appointmentsHistory.push(state.currentAppointment);
-      // Reset the current appointment
       state.currentAppointment = initialState.currentAppointment;
     },
     updateAppointmentStatus: (
       state,
       action: PayloadAction<"accepted" | "rejected">
     ) => {
-      // Update the status of the current appointment
       state.currentAppointment.status = action.payload;
     },
   },

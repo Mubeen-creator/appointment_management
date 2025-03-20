@@ -7,9 +7,10 @@ import { FiTool } from "react-icons/fi";
 import { HiOutlineClock } from "react-icons/hi";
 import Header from "@/components/header/Header";
 import Button from "@/components/button/Button";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setAppointment } from "@/store/slices/appointmentSlice";
 import { useRouter } from "next/navigation";
+import { RootState } from "@/store/store";
 
 export default function MeetingScheduler() {
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
@@ -21,6 +22,7 @@ export default function MeetingScheduler() {
 
   const dispatch = useDispatch();
   const router = useRouter();
+  const user = useSelector((state: RootState) => state.user);
 
   const timeSlots = [
     "9:00am",
@@ -88,11 +90,12 @@ export default function MeetingScheduler() {
         setAppointment({
           date: dateString,
           time: selectedTime,
-          name: "",
-          email: "",
-          message: "",
+          requesterEmail: user.email, // Store requester's email here
+          hostEmail: "", // Will be updated on confirm page
+          message: "", // Will be updated on confirm page
         })
       );
+
       router.push("/confirm");
     }
   };

@@ -11,6 +11,7 @@ import { addAppointmentToHistory } from "@/store/slices/appointmentSlice";
 import { BiBaseball } from "react-icons/bi";
 import { CiCalendar } from "react-icons/ci";
 import { HiOutlineClock } from "react-icons/hi";
+import axios from "axios";
 
 export default function ConfirmMeeting() {
   const [name, setName] = useState("");
@@ -28,58 +29,31 @@ export default function ConfirmMeeting() {
   );
 
   const handleConfirm = async () => {
-    console.log(
-      "[Frontend] handleConfirm triggered at",
-      new Date().toISOString()
-    );
-
     try {
       // Validate required fields
-      console.log("[Frontend] Validating input fields:", {
-        userEmail: user?.email,
-        hostEmail: email,
-        date,
-        time,
-        name,
-      });
-
       if (!user?.email || !email || !date || !time || !name) {
         alert("Please fill all required fields");
         return;
       }
 
-      console.log("[Frontend] Starting appointment creation...");
+      const appointmentData = {
+        requesterEmail: user.email, // Requester's email from Redux
+        hostEmail: email, // Host email from user input
+        date,
+        time,
+        message: notes, // User's message
+      };
 
-      // Create appointment
-      const appointmentResponse = await fetch(
-        `/api/appointments`, // Use absolute URL with correct port
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            requesterEmail: user.email,
-            hostEmail: email,
-            date,
-            time,
-            message: notes,
-          }),
-        }
+      // Debugging log before sending request
+      console.log("[Frontend] Sending appointment request:", appointmentData);
+
+      // Send request to create appointment
+      const appointmentResponse = await axios.post(
+        "/api/appointments",
+        appointmentData
       );
 
-      console.log("[Frontend] Appointment response:", appointmentResponse);
-
-      if (!appointmentResponse.ok) {
-        const error = await appointmentResponse.text(); // Use text() to capture non-JSON responses
-        console.error("[Frontend] Appointment error:", error);
-        alert(`Appointment failed: ${error}`);
-        return;
-      }
-
-      const appointmentData = await appointmentResponse.json();
-      console.log("[Frontend] Appointment created:", appointmentData);
-
-      // Convert MongoDB ObjectId to string for email payload
-      appointmentData.id = appointmentData.id.toString();
+      console.log("[Frontend] Appointment created:", appointmentResponse.data);
 
       // Prepare email payload
       const emailPayload = {
@@ -89,34 +63,24 @@ export default function ConfirmMeeting() {
         appointmentData,
       };
 
-      console.log("[Frontend] Sending email with payload:", emailPayload);
+      console.log("[Frontend] Sending email request:", emailPayload);
 
       // Send email
-      const emailResponse = await fetch(`/api/send-email`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(emailPayload),
-      });
+      const emailResponse = await axios.post("/api/send-email", emailPayload);
 
-      console.log("[Frontend] Email response status:", emailResponse.status);
+      console.log("[Frontend] Email sent successfully:", emailResponse.data);
 
-      if (!emailResponse.ok) {
-        const errorBody = await emailResponse.text();
-        console.error("[Frontend] Email error response:", errorBody);
-        alert(`Email failed: ${errorBody}`);
-        return;
-      }
-
-      console.log("[Frontend] Email sent successfully");
+      // Dispatch action to update appointment history in Redux
       dispatch(addAppointmentToHistory());
+
+      // Navigate to confirmation screen
       router.push("/meeting-confirmation");
     } catch (error: any) {
-      console.error("[Frontend] Full error details:", {
-        message: error.message,
-        stack: error.stack,
-        error: error,
-      });
-      alert("An unexpected error occurred. Please check the console.");
+      console.error(
+        "[Frontend] Error occurred:",
+        error.response?.data || error.message
+      );
+      alert("An unexpected error occurred. Please try again.");
     }
   };
 

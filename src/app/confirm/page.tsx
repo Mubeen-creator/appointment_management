@@ -29,58 +29,56 @@ export default function ConfirmMeeting() {
   );
 
   const handleConfirm = async () => {
+    event?.preventDefault();
     try {
-      // Validate required fields
+      // Validate fields
       if (!user?.email || !email || !date || !time || !name) {
         alert("Please fill all required fields");
         return;
       }
 
-      const appointmentData = {
+      // Step 1: Create the appointment
+      const appointmentResponse = await axios.post("/api/appointments", {
         requesterEmail: user.email, // Requester's email from Redux
         hostEmail: email, // Host email from user input
         date,
         time,
-        message: notes, // User's message
-      };
+        message: notes, // Message from user input
+      });
 
-      // Debugging log before sending request
-      console.log("[Frontend] Sending appointment request:", appointmentData);
+      if (appointmentResponse.status !== 201) {
+        alert(`Appointment failed: ${appointmentResponse.data.message}`);
+        return;
+      }
 
-      // Send request to create appointment
-      const appointmentResponse = await axios.post(
-        "/api/appointments",
-        appointmentData
-      );
-
-      console.log("[Frontend] Appointment created:", appointmentResponse.data);
-
-      // Prepare email payload
       const emailPayload = {
         to: email,
         subject: `New Appointment Request from ${name}`,
         text: `Hi there,\n\n${name} has requested an appointment on ${date} at ${time}.\n\nMessage: ${notes}`,
-        appointmentData,
+        appointmentData: {
+          requesterEmail: user.email,
+          hostEmail: email,
+          date,
+          time,
+          message: notes,
+        },
       };
 
-      console.log("[Frontend] Sending email request:", emailPayload);
+      console.log("[Frontend] Sending email request:", emailPayload); // Debugging log
 
-      // Send email
+      // Hit the correct API route `/api/send-email`
       const emailResponse = await axios.post("/api/send-email", emailPayload);
 
-      console.log("[Frontend] Email sent successfully:", emailResponse.data);
+      if (emailResponse.status !== 200) {
+        alert(`Email failed: ${emailResponse.data.message}`);
+        return;
+      }
 
-      // Dispatch action to update appointment history in Redux
       dispatch(addAppointmentToHistory());
-
-      // Navigate to confirmation screen
       router.push("/meeting-confirmation");
-    } catch (error: any) {
-      console.error(
-        "[Frontend] Error occurred:",
-        error.response?.data || error.message
-      );
-      alert("An unexpected error occurred. Please try again.");
+    } catch (error) {
+      console.error("Error:", error);
+      alert("An unexpected error occurred.");
     }
   };
 

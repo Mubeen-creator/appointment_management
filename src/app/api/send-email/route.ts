@@ -13,8 +13,8 @@ export async function OPTIONS() {
 }
 
 export async function POST(req: Request) {
+  const body = await req.json(); // Axios sends JSON by default
   try {
-    const body = await req.json(); // Axios sends JSON by default
     const { to, subject, text, appointmentData } = body;
 
     console.log("[Backend] Received email request:", body); // Debugging log
@@ -28,13 +28,15 @@ export async function POST(req: Request) {
     });
 
     const emailContent = `
-      Subject: ${subject}
-      Requester Email: ${appointmentData.requesterEmail}
-      Host Email: ${appointmentData.hostEmail}
-      Date: ${appointmentData.date}
-      Time: ${appointmentData.time}
-      Message: ${appointmentData.message}
-    `;
+  Hi there,
+
+  You have a new appointment request from ${appointmentData.requesterEmail}.
+
+  Date: ${appointmentData.date}
+  Time: ${appointmentData.time}
+
+  Message: ${appointmentData.message}
+`;
 
     const mailOptions = {
       from: process.env.EMAIL_USER,
@@ -57,6 +59,7 @@ export async function POST(req: Request) {
     );
   } catch (error) {
     console.error("[Backend] Error sending email:", error);
+    console.error("request body ===> :", body);
     return new NextResponse(
       JSON.stringify({ message: "Failed to send email", error }),
       {

@@ -80,19 +80,20 @@ export default function MeetingScheduler() {
 
   const handleSchedule = () => {
     if (selectedDate && selectedTime) {
-      const dateString = selectedDate.toLocaleDateString("en-US", {
-        weekday: "long",
-        month: "long",
-        day: "numeric",
-      });
+      // const dateString = selectedDate.toLocaleDateString("en-US", {
+      //   weekday: "long",
+      //   month: "long",
+      //   day: "numeric",
+      // });
 
+      const dateString = selectedDate.toISOString().split("T")[0]; // Format: YYYY-MM-DD
       dispatch(
         setAppointment({
           date: dateString,
           time: selectedTime,
-          requesterEmail: user.email, // Store requester's email here
-          hostEmail: "", // Will be updated on confirm page
-          message: "", // Will be updated on confirm page
+          requesterEmail: user.email,
+          hostEmail: "",
+          message: "",
         })
       );
 

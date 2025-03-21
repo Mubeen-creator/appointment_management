@@ -2,8 +2,16 @@
 "use client";
 
 import { useState } from "react";
-import { useSelector } from "react-redux";
-import { RootState } from "@/store/store";
+import { Bar } from "react-chartjs-2";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+} from "chart.js";
 import {
   FiPlus,
   FiGrid,
@@ -17,12 +25,48 @@ import {
   FiChevronRight,
 } from "react-icons/fi";
 
+// Register Chart.js components
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend
+);
+
 export default function ScheduledEvents() {
   const [activeTab, setActiveTab] = useState("Upcoming");
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const appointmentsHistory = useSelector(
-    (state: RootState) => state.appointment.appointmentsHistory
-  );
+  const [activeSidebarOption, setActiveSidebarOption] =
+    useState("Scheduled events"); // State to track active sidebar option
+
+  // Sample data for the bar graph
+  const data = {
+    labels: ["January", "February", "March", "April", "May", "June", "July"],
+    datasets: [
+      {
+        label: "Appointments",
+        data: [65, 59, 80, 81, 56, 55, 40],
+        backgroundColor: "rgba(54, 162, 235, 0.2)",
+        borderColor: "rgba(54, 162, 235, 1)",
+        borderWidth: 1,
+      },
+    ],
+  };
+
+  const options = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: "top" as const,
+      },
+      title: {
+        display: true,
+        text: "Appointment Analytics",
+      },
+    },
+  };
 
   return (
     <div className="flex h-screen relative">
@@ -55,11 +99,25 @@ export default function ScheduledEvents() {
           </button>
         </div>
         <div className="mt-4 px-2">
-          <div className="flex items-center px-4 py-3 text-blue-600 border-l-4 border-blue-600 bg-blue-50 rounded-md">
+          <div
+            className={`flex items-center px-4 py-3 rounded-md cursor-pointer ${
+              activeSidebarOption === "Scheduled events"
+                ? "bg-blue-50 border-l-4 border-blue-600 text-blue-600"
+                : "text-gray-600 hover:bg-gray-100"
+            }`}
+            onClick={() => setActiveSidebarOption("Scheduled events")}
+          >
             <FiGrid size={18} className="mr-3" />
             <span className="text-sm font-medium">Scheduled events</span>
           </div>
-          <div className="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-md mt-1">
+          <div
+            className={`flex items-center px-4 py-3 rounded-md cursor-pointer mt-1 ${
+              activeSidebarOption === "Analytics"
+                ? "bg-blue-50 border-l-4 border-blue-600 text-blue-600"
+                : "text-gray-600 hover:bg-gray-100"
+            }`}
+            onClick={() => setActiveSidebarOption("Analytics")}
+          >
             <FiPieChart size={18} className="mr-3" />
             <span className="text-sm font-medium">Analytics</span>
           </div>
@@ -96,117 +154,130 @@ export default function ScheduledEvents() {
             </div>
           </div>
 
-          {/* Calendar Selection */}
-          <div className="bg-white rounded-md shadow-sm p-4 mb-4">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center space-y-2 md:space-y-0">
-              <div className="relative">
-                <select className="appearance-none bg-transparent pr-8 pl-2 py-1 border border-gray-300 rounded-md text-sm">
-                  <option>My Calendly</option>
-                </select>
-                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                  <FiChevronRight size={14} className="transform rotate-90" />
-                </div>
-              </div>
-              <div className="text-sm text-gray-500">
-                Displaying 1 of 1 Events
-              </div>
+          {/* Show Analytics Graph if Analytics is clicked */}
+          {activeSidebarOption === "Analytics" && (
+            <div className="bg-white rounded-md shadow-sm p-4 mb-4">
+              <Bar data={data} options={options} />
             </div>
-          </div>
+          )}
 
-          {/* Tabs and Actions */}
-          <div className="bg-white rounded-t-md shadow-sm">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center px-4 pt-4">
-              <div className="flex overflow-x-auto scrollbar-hide border-b border-gray-200 w-full">
-                <button
-                  className={`py-2 px-4 text-sm whitespace-nowrap ${
-                    activeTab === "Upcoming"
-                      ? "border-b-2 border-blue-600 text-blue-600"
-                      : "text-gray-500"
-                  }`}
-                  onClick={() => setActiveTab("Upcoming")}
-                >
-                  Upcoming
-                </button>
-                <button
-                  className={`py-2 px-4 text-sm whitespace-nowrap ${
-                    activeTab === "Pending"
-                      ? "border-b-2 border-blue-600 text-blue-600"
-                      : "text-gray-500"
-                  }`}
-                  onClick={() => setActiveTab("Pending")}
-                >
-                  Pending
-                </button>
-                <button
-                  className={`py-2 px-4 text-sm whitespace-nowrap ${
-                    activeTab === "Past"
-                      ? "border-b-2 border-blue-600 text-blue-600"
-                      : "text-gray-500"
-                  }`}
-                  onClick={() => setActiveTab("Past")}
-                >
-                  Past
-                </button>
-                <button
-                  className={`py-2 px-4 text-sm whitespace-nowrap ${
-                    activeTab === "DateRange"
-                      ? "border-b-2 border-blue-600 text-blue-600"
-                      : "text-gray-500"
-                  }`}
-                  onClick={() => setActiveTab("DateRange")}
-                >
-                  Date Range
-                </button>
-              </div>
-              <div className="flex items-center mt-4 md:mt-0 w-full md:w-auto justify-end">
-                <button className="mr-2 px-4 py-1 text-sm border border-gray-300 rounded-md flex items-center hover:bg-gray-50">
-                  <FiDownload size={16} className="mr-2" />
-                  Export
-                </button>
-                <button className="px-4 py-1 text-sm border border-gray-300 rounded-md flex items-center hover:bg-gray-50">
-                  <FiFilter size={16} className="mr-2" />
-                  Filter
-                </button>
-              </div>
-            </div>
-
-            {/* Event List */}
-            <div className="p-4">
-              <div className="text-sm font-medium text-gray-600 mb-4">
-                Wednesday, 27 March 2024
-              </div>
-
-              <div className="flex items-center mb-4 border border-gray-200 rounded-md p-3 hover:bg-gray-50">
-                <div className="w-6 h-6 rounded-full bg-purple-500 mr-4 flex-shrink-0"></div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex flex-col md:flex-row md:justify-between">
-                    <div>
-                      <div className="text-sm text-gray-600">
-                        11:00am - 11:30am
-                      </div>
-                      <div className="font-medium">test</div>
-                      <div className="text-sm text-gray-600">
-                        Event type: 30 Minute Meeting
-                      </div>
-                    </div>
-                    <div className="text-left md:text-right mt-2 md:mt-0">
-                      <div className="text-sm text-gray-600">
-                        1 host | 0 non-hosts
-                      </div>
+          {/* Show Default Content if Scheduled Events is clicked */}
+          {activeSidebarOption === "Scheduled events" && (
+            <>
+              {/* Calendar Selection */}
+              <div className="bg-white rounded-md shadow-sm p-4 mb-4">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center space-y-2 md:space-y-0">
+                  <div className="relative">
+                    <select className="appearance-none bg-transparent pr-8 pl-2 py-1 border border-gray-300 rounded-md text-sm">
+                      <option>My Calendly</option>
+                    </select>
+                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                      <FiChevronRight
+                        size={14}
+                        className="transform rotate-90"
+                      />
                     </div>
                   </div>
+                  <div className="text-sm text-gray-500">
+                    Displaying 1 of 1 Events
+                  </div>
                 </div>
-                <button className="ml-2 md:ml-4 text-gray-500 hover:text-gray-800 flex-shrink-0">
-                  <span className="hidden md:inline">Details</span>
-                  <FiChevronRight size={20} />
-                </button>
               </div>
 
-              <div className="text-center text-sm text-gray-500 py-4">
-                You've reached the end of the list
+              {/* Tabs and Actions */}
+              <div className="bg-white rounded-t-md shadow-sm">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center px-4 pt-4">
+                  <div className="flex overflow-x-auto scrollbar-hide border-b border-gray-200 w-full">
+                    <button
+                      className={`py-2 px-4 text-sm whitespace-nowrap ${
+                        activeTab === "Upcoming"
+                          ? "border-b-2 border-blue-600 text-blue-600"
+                          : "text-gray-500"
+                      }`}
+                      onClick={() => setActiveTab("Upcoming")}
+                    >
+                      Upcoming
+                    </button>
+                    <button
+                      className={`py-2 px-4 text-sm whitespace-nowrap ${
+                        activeTab === "Pending"
+                          ? "border-b-2 border-blue-600 text-blue-600"
+                          : "text-gray-500"
+                      }`}
+                      onClick={() => setActiveTab("Pending")}
+                    >
+                      Pending
+                    </button>
+                    <button
+                      className={`py-2 px-4 text-sm whitespace-nowrap ${
+                        activeTab === "Past"
+                          ? "border-b-2 border-blue-600 text-blue-600"
+                          : "text-gray-500"
+                      }`}
+                      onClick={() => setActiveTab("Past")}
+                    >
+                      Past
+                    </button>
+                    <button
+                      className={`py-2 px-4 text-sm whitespace-nowrap ${
+                        activeTab === "DateRange"
+                          ? "border-b-2 border-blue-600 text-blue-600"
+                          : "text-gray-500"
+                      }`}
+                      onClick={() => setActiveTab("DateRange")}
+                    >
+                      Date Range
+                    </button>
+                  </div>
+                  <div className="flex items-center mt-4 md:mt-0 w-full md:w-auto justify-end">
+                    <button className="mr-2 px-4 py-1 text-sm border border-gray-300 rounded-md flex items-center hover:bg-gray-50">
+                      <FiDownload size={16} className="mr-2" />
+                      Export
+                    </button>
+                    <button className="px-4 py-1 text-sm border border-gray-300 rounded-md flex items-center hover:bg-gray-50">
+                      <FiFilter size={16} className="mr-2" />
+                      Filter
+                    </button>
+                  </div>
+                </div>
+
+                {/* Event List */}
+                <div className="p-4">
+                  <div className="text-sm font-medium text-gray-600 mb-4">
+                    Wednesday, 27 March 2024
+                  </div>
+
+                  <div className="flex items-center mb-4 border border-gray-200 rounded-md p-3 hover:bg-gray-50">
+                    <div className="w-6 h-6 rounded-full bg-purple-500 mr-4 flex-shrink-0"></div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex flex-col md:flex-row md:justify-between">
+                        <div>
+                          <div className="text-sm text-gray-600">10:00 AM</div>
+                          <div className="font-medium">Meeting with John</div>
+                          <div className="text-sm text-gray-600">
+                            Event type: 30 Minute Meeting
+                          </div>
+                        </div>
+                        <div className="text-left md:text-right mt-2 md:mt-0">
+                          <div className="text-sm text-gray-600">
+                            1 host | 0 non-hosts
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <button className="ml-2 md:ml-4 text-gray-500 hover:text-gray-800 flex-shrink-0">
+                      <span className="hidden md:inline">Details</span>
+                      <FiChevronRight size={20} />
+                    </button>
+                  </div>
+
+                  <div className="text-center text-sm text-gray-500 py-4">
+                    You've reached the end of the list
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
+            </>
+          )}
         </div>
       </div>
     </div>

@@ -1,18 +1,32 @@
 "use client";
 
-// app/meeting-confirmation/page.tsx
 import Header from "@/components/header/Header";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { TiTick } from "react-icons/ti";
 import { MdOutlineOpenInNew } from "react-icons/md";
-import { CiUser } from "react-icons/ci";
-import { CiCalendar } from "react-icons/ci";
+import { CiUser, CiCalendar } from "react-icons/ci";
 import { BiBaseball } from "react-icons/bi";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
+import { useRouter } from "next/navigation";
 
 const Page = () => {
   const appointment = useSelector((state: RootState) => state.appointment);
+  const router = useRouter();
+  const [countdown, setCountdown] = useState(3); // Countdown timer (in seconds)
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCountdown((prev) => prev - 1);
+    }, 1000);
+
+    if (countdown === 0) {
+      clearInterval(timer);
+      router.push("/dashboard"); // Redirect to dashboard
+    }
+
+    return () => clearInterval(timer);
+  }, [countdown, router]);
 
   return (
     <div className="bg-gray-100 min-h-screen flex flex-col">
@@ -35,6 +49,11 @@ const Page = () => {
             A calendar invitation has been sent to your email address.
           </p>
         </div>
+        {/* Countdown Timer */}
+        <p className="mt-4 text-gray-500 text-sm md:text-base">
+          Redirecting to dashboard in{" "}
+          <span className="font-bold">{countdown}</span> seconds...
+        </p>
         {/* Open invitation button */}
         <div className="flex items-center justify-center border border-gray-600 rounded-full gap-x-2 py-2 mt-4 md:mt-5 w-[170px] cursor-pointer hover:bg-gray-50 transition-colors">
           <p className="text-sm md:text-base">Open Invitation</p>
@@ -71,68 +90,3 @@ const Page = () => {
 };
 
 export default Page;
-
-// import Header from "@/components/header/Header";
-// import React from "react";
-// import { TiTick } from "react-icons/ti";
-// import { MdOutlineOpenInNew } from "react-icons/md";
-// import { CiUser } from "react-icons/ci";
-// import { CiCalendar } from "react-icons/ci";
-// import { BiBaseball } from "react-icons/bi";
-
-// const page = () => {
-//   return (
-//     <div className="bg-gray-100 w-screen h-screen flex flex-col">
-//       <Header />
-//       {/* contents */}
-//       <div className="flex flex-col items-center justify-start w-[60%] h-[70%] shadow-sm shadow-gray-400 rounded-sm bg-white mx-auto my-auto">
-//         <div className="flex gap-x-3 items-center justify-center mt-10">
-//           <div className="bg-green-700 p-2 rounded-full flex items-center justify-center">
-//             <TiTick size={15} color="white" />
-//           </div>
-//           <div>
-//             <h1 className="font-bold text-black tracking-wide">
-//               You are Schedule
-//             </h1>
-//           </div>
-//         </div>
-//         {/* description */}
-//         <div>
-//           <p className="text-sm mt-5 text-gray-600">
-//             A calendar invitation has been sent to your email address.
-//           </p>
-//         </div>
-//         {/* Open invitation button */}
-//         <div className="flex items-center justify-center border border-gray-600 rounded-full gap-x-2 py-2 mt-5 w-[170px] cursor-pointer">
-//           <p>Open Invitation</p>
-//           <MdOutlineOpenInNew size={25} color="black" />
-//         </div>
-//         {/* Detail box */}
-//         <div className="w-auto h-auto border border-gray-300 p-4 mt-10 rounded-md">
-//           <h1 className="font-bold text-xl">30 Minutes Meeting</h1>
-//           {/* username and icon */}
-//           <div className="mt-2 flex items-center justify-start">
-//             <CiUser size={25} color="gray-600" />
-//             <p className="ml-2 font-semibold text-gray-500">Muhammad Talha</p>
-//           </div>
-//           {/* date and time */}
-//           <div className="mt-2 flex items-center justify-start">
-//             <CiCalendar size={25} color="gray-600" />
-//             <p className="ml-2 font-semibold text-gray-500">
-//               11:00 - 11:30, Wednesday, March 27, 2024
-//             </p>
-//           </div>
-//           {/* country time */}
-//           <div className="mt-2 flex items-center justify-start">
-//             <BiBaseball size={25} color="gray-200" />
-//             <p className="ml-2 font-semibold text-gray-500">
-//               Pakistan, Maldives Time
-//             </p>
-//           </div>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default page;

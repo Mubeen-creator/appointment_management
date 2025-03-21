@@ -1,6 +1,8 @@
+// app/api/appointments/route.ts
 import clientPromise from "@/app/lib/mongodb";
 import { NextResponse } from "next/server";
 
+// POST: Create a new appointment
 export async function POST(request: Request) {
   console.log(
     "\n\n[API] /api/appointments triggered at",
@@ -47,6 +49,40 @@ export async function POST(request: Request) {
     );
   } catch (error) {
     console.error("[API] Appointment creation failed:", error);
+    return NextResponse.json(
+      { message: "Internal server error" },
+      { status: 500 }
+    );
+  }
+}
+
+// GET: Fetch appointments for a specific user
+export async function GET(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const email = searchParams.get("email"); // Get the user's email from query params
+
+    if (!email) {
+      return NextResponse.json(
+        { message: "Email is required" },
+        { status: 400 }
+      );
+    }
+
+    const client = await clientPromise;
+    const db = client.db("appointmentManagement");
+
+    // Fetch appointments for the user (both as requester and host)
+    const appointments = await db
+      .collection("appointments")
+      .find({
+        $or: [{ requesterEmail: email }, { hostEmail: email }],
+      })
+      .toArray();
+
+    return NextResponse.json(appointments, { status: 200 });
+  } catch (error) {
+    console.error("[API] Error fetching appointments:", error);
     return NextResponse.json(
       { message: "Internal server error" },
       { status: 500 }

@@ -1,3 +1,4 @@
+// store/slices/appointmentSlice.ts
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface Appointment {
@@ -10,8 +11,8 @@ interface Appointment {
 }
 
 interface AppointmentState {
-  currentAppointment: Appointment; // Single appointment (for scheduling)
-  appointmentsHistory: Appointment[]; // Array of past appointments (for profile)
+  currentAppointment: Appointment;
+  appointmentsHistory: Appointment[];
 }
 
 const initialState: AppointmentState = {
@@ -23,7 +24,7 @@ const initialState: AppointmentState = {
     message: "",
     status: "pending",
   },
-  appointmentsHistory: [], // Initialize as empty array
+  appointmentsHistory: [],
 };
 
 const appointmentSlice = createSlice({
@@ -59,6 +60,9 @@ const appointmentSlice = createSlice({
     ) => {
       state.currentAppointment.status = action.payload;
     },
+    setAppointmentsHistory: (state, action: PayloadAction<Appointment[]>) => {
+      state.appointmentsHistory = action.payload;
+    },
   },
 });
 
@@ -66,5 +70,6 @@ export const {
   setAppointment,
   addAppointmentToHistory,
   updateAppointmentStatus,
+  setAppointmentsHistory,
 } = appointmentSlice.actions;
 export default appointmentSlice.reducer;

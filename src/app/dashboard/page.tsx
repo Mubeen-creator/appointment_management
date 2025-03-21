@@ -1,7 +1,9 @@
 // app/profile/page.tsx
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { RootState } from "@/store/store";
 import { Bar } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -24,6 +26,7 @@ import {
   FiFilter,
   FiChevronRight,
 } from "react-icons/fi";
+import { setAppointmentsHistory } from "@/store/slices/appointmentSlice";
 
 // Register Chart.js components
 ChartJS.register(
@@ -39,21 +42,67 @@ export default function ScheduledEvents() {
   const [activeTab, setActiveTab] = useState("Upcoming");
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [activeSidebarOption, setActiveSidebarOption] =
-    useState("Scheduled events"); // State to track active sidebar option
+    useState("Scheduled events");
+  const dispatch = useDispatch();
+  const user = useSelector((state: RootState) => state.user);
+  const appointmentsHistory = useSelector(
+    (state: RootState) => state.appointment.appointmentsHistory
+  );
 
-  // Sample data for the bar graph
-  const data = {
-    labels: ["January", "February", "March", "April", "May", "June", "July"],
-    datasets: [
-      {
-        label: "Appointments",
-        data: [65, 59, 80, 81, 56, 55, 40],
-        backgroundColor: "rgba(54, 162, 235, 0.2)",
-        borderColor: "rgba(54, 162, 235, 1)",
-        borderWidth: 1,
-      },
-    ],
+  // Fetch appointments when the component mounts
+  useEffect(() => {
+    const fetchAppointments = async () => {
+      try {
+        const response = await fetch(`/api/appointments?email=${user.email}`);
+        const data = await response.json();
+        dispatch(setAppointmentsHistory(data));
+      } catch (error) {
+        console.error("Error fetching appointments:", error);
+      }
+    };
+
+    if (user.email) {
+      fetchAppointments();
+    }
+  }, [user.email, dispatch]);
+
+  // Generate bar graph data from appointments
+  const generateBarGraphData = () => {
+    const appointmentsPerMonth = Array(12).fill(0); // Initialize an array for 12 months
+
+    appointmentsHistory.forEach((appointment) => {
+      const month = new Date(appointment.date).getMonth(); // Get the month index (0-11)
+      appointmentsPerMonth[month]++;
+    });
+
+    return {
+      labels: [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December",
+      ],
+      datasets: [
+        {
+          label: "Appointments",
+          data: appointmentsPerMonth,
+          backgroundColor: "rgba(54, 162, 235, 0.2)",
+          borderColor: "rgba(54, 162, 235, 1)",
+          borderWidth: 1,
+        },
+      ],
+    };
   };
+
+  const data = generateBarGraphData();
 
   const options = {
     responsive: true,
@@ -179,7 +228,8 @@ export default function ScheduledEvents() {
                     </div>
                   </div>
                   <div className="text-sm text-gray-500">
-                    Displaying 1 of 1 Events
+                    Displaying {appointmentsHistory.length} of{" "}
+                    {appointmentsHistory.length} Events
                   </div>
                 </div>
               </div>
@@ -244,32 +294,45 @@ export default function ScheduledEvents() {
                 {/* Event List */}
                 <div className="p-4">
                   <div className="text-sm font-medium text-gray-600 mb-4">
-                    Wednesday, 27 March 2024
+                    {new Date().toLocaleDateString("en-US", {
+                      weekday: "long",
+                      month: "long",
+                      day: "numeric",
+                    })}
                   </div>
 
-                  <div className="flex items-center mb-4 border border-gray-200 rounded-md p-3 hover:bg-gray-50">
-                    <div className="w-6 h-6 rounded-full bg-purple-500 mr-4 flex-shrink-0"></div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex flex-col md:flex-row md:justify-between">
-                        <div>
-                          <div className="text-sm text-gray-600">10:00 AM</div>
-                          <div className="font-medium">Meeting with John</div>
-                          <div className="text-sm text-gray-600">
-                            Event type: 30 Minute Meeting
+                  {appointmentsHistory.map((appointment, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center mb-4 border border-gray-200 rounded-md p-3 hover:bg-gray-50"
+                    >
+                      <div className="w-6 h-6 rounded-full bg-purple-500 mr-4 flex-shrink-0"></div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex flex-col md:flex-row md:justify-between">
+                          <div>
+                            <div className="text-sm text-gray-600">
+                              {appointment.time}
+                            </div>
+                            <div className="font-medium">
+                              Meeting with {appointment.hostEmail}
+                            </div>
+                            <div className="text-sm text-gray-600">
+                              Event type: 30 Minute Meeting
+                            </div>
                           </div>
-                        </div>
-                        <div className="text-left md:text-right mt-2 md:mt-0">
-                          <div className="text-sm text-gray-600">
-                            1 host | 0 non-hosts
+                          <div className="text-left md:text-right mt-2 md:mt-0">
+                            <div className="text-sm text-gray-600">
+                              1 host | 0 non-hosts
+                            </div>
                           </div>
                         </div>
                       </div>
+                      <button className="ml-2 md:ml-4 text-gray-500 hover:text-gray-800 flex-shrink-0">
+                        <span className="hidden md:inline">Details</span>
+                        <FiChevronRight size={20} />
+                      </button>
                     </div>
-                    <button className="ml-2 md:ml-4 text-gray-500 hover:text-gray-800 flex-shrink-0">
-                      <span className="hidden md:inline">Details</span>
-                      <FiChevronRight size={20} />
-                    </button>
-                  </div>
+                  ))}
 
                   <div className="text-center text-sm text-gray-500 py-4">
                     You've reached the end of the list

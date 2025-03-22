@@ -61,10 +61,11 @@ export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const email = searchParams.get("email"); // Get the user's email from query params
+    const hostEmail = searchParams.get("hostEmail"); // Get the host's email from query params
 
-    if (!email) {
+    if (!email && !hostEmail) {
       return NextResponse.json(
-        { message: "Email is required" },
+        { message: "Email or hostEmail is required" },
         { status: 400 }
       );
     }
@@ -72,12 +73,16 @@ export async function GET(request: Request) {
     const client = await clientPromise;
     const db = client.db("appointmentManagement");
 
-    // Fetch appointments for the user (both as requester and host)
+    let query = {};
+    if (email) {
+      query = { requesterEmail: email }; // Fetch appointments where the user is the requester
+    } else if (hostEmail) {
+      query = { hostEmail: hostEmail }; // Fetch appointments where the user is the host
+    }
+
     const appointments = await db
       .collection("appointments")
-      .find({
-        $or: [{ requesterEmail: email }, { hostEmail: email }],
-      })
+      .find(query)
       .toArray();
 
     return NextResponse.json(appointments, { status: 200 });

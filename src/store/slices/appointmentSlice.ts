@@ -13,6 +13,7 @@ interface Appointment {
 interface AppointmentState {
   currentAppointment: Appointment;
   appointmentsHistory: Appointment[];
+  hostAppointments: Appointment[]; // New state for host appointments
 }
 
 const initialState: AppointmentState = {
@@ -25,6 +26,7 @@ const initialState: AppointmentState = {
     status: "pending",
   },
   appointmentsHistory: [],
+  hostAppointments: [], // Initialize host appointments
 };
 
 const appointmentSlice = createSlice({
@@ -63,6 +65,9 @@ const appointmentSlice = createSlice({
     setAppointmentsHistory: (state, action: PayloadAction<Appointment[]>) => {
       state.appointmentsHistory = action.payload;
     },
+    setHostAppointments: (state, action: PayloadAction<Appointment[]>) => {
+      state.hostAppointments = action.payload; // Set host appointments
+    },
   },
 });
 
@@ -71,5 +76,6 @@ export const {
   addAppointmentToHistory,
   updateAppointmentStatus,
   setAppointmentsHistory,
+  setHostAppointments, // Export the new action
 } = appointmentSlice.actions;
 export default appointmentSlice.reducer;

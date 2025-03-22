@@ -13,11 +13,9 @@ export async function OPTIONS() {
 }
 
 export async function POST(req: Request) {
-  const body = await req.json(); // Axios sends JSON by default
+  const body = await req.json();
   try {
     const { to, subject, text, appointmentData } = body;
-
-    console.log("[Backend] Received email request:", body); // Debugging log
 
     const transporter = nodemailer.createTransport({
       service: "gmail",
@@ -28,12 +26,13 @@ export async function POST(req: Request) {
     });
 
     const emailContent = `
-  Hi there,
+  Hi ${appointmentData.hostName},
 
   You have a new appointment request from ${appointmentData.requesterEmail}.
 
   Date: ${appointmentData.date}
   Time: ${appointmentData.time}
+  Time Zone: ${appointmentData.timeZone}
 
   Message: ${appointmentData.message}
 `;
@@ -59,7 +58,6 @@ export async function POST(req: Request) {
     );
   } catch (error) {
     console.error("[Backend] Error sending email:", error);
-    console.error("request body ===> :", body);
     return new NextResponse(
       JSON.stringify({ message: "Failed to send email", error }),
       {

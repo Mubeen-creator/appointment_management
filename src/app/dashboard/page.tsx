@@ -26,7 +26,10 @@ import {
   FiFilter,
   FiChevronRight,
 } from "react-icons/fi";
-import { setAppointmentsHistory } from "@/store/slices/appointmentSlice";
+import {
+  setAppointmentsHistory,
+  setHostAppointments,
+} from "@/store/slices/appointmentSlice";
 
 // Register Chart.js components
 ChartJS.register(
@@ -43,10 +46,14 @@ export default function ScheduledEvents() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [activeSidebarOption, setActiveSidebarOption] =
     useState("Scheduled events");
+  const [dropdownOption, setDropdownOption] = useState("My Calendly"); // New state for dropdown
   const dispatch = useDispatch();
   const user = useSelector((state: RootState) => state.user);
   const appointmentsHistory = useSelector(
     (state: RootState) => state.appointment.appointmentsHistory
+  );
+  const hostAppointments = useSelector(
+    (state: RootState) => state.appointment.hostAppointments
   );
 
   // Fetch appointments when the component mounts
@@ -56,6 +63,13 @@ export default function ScheduledEvents() {
         const response = await fetch(`/api/appointments?email=${user.email}`);
         const data = await response.json();
         dispatch(setAppointmentsHistory(data));
+
+        // Fetch appointments where the user is the host
+        const hostResponse = await fetch(
+          `/api/appointments?hostEmail=${user.email}`
+        );
+        const hostData = await hostResponse.json();
+        dispatch(setHostAppointments(hostData));
       } catch (error) {
         console.error("Error fetching appointments:", error);
       }
@@ -68,10 +82,10 @@ export default function ScheduledEvents() {
 
   // Generate bar graph data from appointments
   const generateBarGraphData = () => {
-    const appointmentsPerMonth = Array(12).fill(0); // Initialize an array for 12 months
+    const appointmentsPerMonth = Array(12).fill(0);
 
     appointmentsHistory.forEach((appointment) => {
-      const month = new Date(appointment.date).getMonth(); // Get the month index (0-11)
+      const month = new Date(appointment.date).getMonth();
       appointmentsPerMonth[month]++;
     });
 
@@ -217,8 +231,13 @@ export default function ScheduledEvents() {
               <div className="bg-white rounded-md shadow-sm p-4 mb-4">
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center space-y-2 md:space-y-0">
                   <div className="relative">
-                    <select className="appearance-none bg-transparent pr-8 pl-2 py-1 border border-gray-300 rounded-md text-sm">
-                      <option>My Calendly</option>
+                    <select
+                      className="appearance-none bg-transparent pr-8 pl-2 py-1 border border-gray-300 rounded-md text-sm"
+                      value={dropdownOption}
+                      onChange={(e) => setDropdownOption(e.target.value)}
+                    >
+                      <option value="My Calendly">My Calendly</option>
+                      <option value="Requests to Me">Requests to Me</option>
                     </select>
                     <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
                       <FiChevronRight
@@ -228,8 +247,15 @@ export default function ScheduledEvents() {
                     </div>
                   </div>
                   <div className="text-sm text-gray-500">
-                    Displaying {appointmentsHistory.length} of{" "}
-                    {appointmentsHistory.length} Events
+                    Displaying{" "}
+                    {dropdownOption === "My Calendly"
+                      ? appointmentsHistory.length
+                      : hostAppointments.length}{" "}
+                    of{" "}
+                    {dropdownOption === "My Calendly"
+                      ? appointmentsHistory.length
+                      : hostAppointments.length}{" "}
+                    Events
                   </div>
                 </div>
               </div>
@@ -301,7 +327,10 @@ export default function ScheduledEvents() {
                     })}
                   </div>
 
-                  {appointmentsHistory.map((appointment, index) => (
+                  {(dropdownOption === "My Calendly"
+                    ? appointmentsHistory
+                    : hostAppointments
+                  ).map((appointment, index) => (
                     <div
                       key={index}
                       className="flex items-center mb-4 border border-gray-200 rounded-md p-3 hover:bg-gray-50"
@@ -314,7 +343,10 @@ export default function ScheduledEvents() {
                               {appointment.time}
                             </div>
                             <div className="font-medium">
-                              Meeting with {appointment.hostEmail}
+                              Meeting with{" "}
+                              {dropdownOption === "My Calendly"
+                                ? appointment.hostEmail
+                                : appointment.requesterEmail}
                             </div>
                             <div className="text-sm text-gray-600">
                               Event type: 30 Minute Meeting

@@ -1,4 +1,3 @@
-// store/slices/availabilitySlice.ts
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface AvailabilityState {

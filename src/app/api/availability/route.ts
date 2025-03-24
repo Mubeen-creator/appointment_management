@@ -5,6 +5,9 @@ export async function POST(request: Request) {
   try {
     const { email, startTime, endTime, availableDays } = await request.json();
 
+    // Log the request body for debugging
+    console.log("Request body:", { email, startTime, endTime, availableDays });
+
     // Detailed validation
     const missingFields = [];
     if (!email) missingFields.push("email");
@@ -21,9 +24,11 @@ export async function POST(request: Request) {
         { status: 400 }
       );
     }
+
     const client = await clientPromise;
     const db = client.db("appointmentManagement");
 
+    // Update user's availability
     const result = await db.collection("users").updateOne(
       { email },
       {

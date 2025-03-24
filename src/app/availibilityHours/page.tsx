@@ -10,12 +10,15 @@ import { useDispatch, useSelector } from "react-redux";
 import { setAvailability } from "@/store/slices/availabilitySlice";
 import { useRouter } from "next/navigation";
 import { RootState } from "@/store/store";
+
 const Page = () => {
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
   const [selectedDays, setSelectedDays] = useState<string[]>([]);
 
   const user = useSelector((state: RootState) => state.user);
+  // Log the user object to debug
+  console.log("User from Redux store:", user);
 
   const dispatch = useDispatch();
   const router = useRouter();
@@ -27,12 +30,20 @@ const Page = () => {
       return;
     }
 
+    // Log the user object to debug
+    console.log("User from Redux store:", user);
+
+    if (!user.email) {
+      alert("User email is missing. Please sign up again.");
+      return;
+    }
+
     try {
       const response = await fetch("/api/availability", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          email: user.email,
+          email: user.email, // Ensure this is always present
           startTime,
           endTime,
           availableDays: selectedDays,
@@ -57,7 +68,7 @@ const Page = () => {
 
   return (
     <div className="flex flex-col items-center justify-center my-5 px-4">
-      {/* logo */}
+      {/* Logo */}
       <div>
         <Image
           src="/logo.png"
@@ -82,7 +93,7 @@ const Page = () => {
               <br className="hidden md:block" /> accept meetings.
             </p>
           </div>
-          {/* image */}
+          {/* Image */}
           <div>
             <Image
               src="/hours.png"

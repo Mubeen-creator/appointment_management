@@ -5,10 +5,13 @@ export async function POST(request: Request) {
   try {
     const { email, startTime, endTime, availableDays } = await request.json();
 
-    // Log the request body for debugging
-    console.log("Request body:", { email, startTime, endTime, availableDays });
+    console.log("Request body received in API:", {
+      email,
+      startTime,
+      endTime,
+      availableDays,
+    });
 
-    // Detailed validation
     const missingFields = [];
     if (!email) missingFields.push("email");
     if (!startTime) missingFields.push("startTime");
@@ -19,7 +22,7 @@ export async function POST(request: Request) {
       return NextResponse.json(
         {
           message: "Missing required fields",
-          missingFields, // Include which fields are missing
+          missingFields,
         },
         { status: 400 }
       );
@@ -28,7 +31,6 @@ export async function POST(request: Request) {
     const client = await clientPromise;
     const db = client.db("appointmentManagement");
 
-    // Update user's availability
     const result = await db.collection("users").updateOne(
       { email },
       {

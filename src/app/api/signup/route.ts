@@ -1,6 +1,6 @@
-// app/api/signup/route.ts
 import clientPromise from "@/app/lib/mongodb";
 import { NextResponse } from "next/server";
+import bcrypt from "bcrypt";
 
 export async function POST(request: Request) {
   try {
@@ -18,10 +18,16 @@ export async function POST(request: Request) {
       );
     }
 
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
     // Save user to MongoDB
-    await db
-      .collection("users")
-      .insertOne({ email, fullName, userName, password });
+    await db.collection("users").insertOne({
+      email,
+      fullName,
+      userName,
+      password: hashedPassword, // Store hashed password
+    });
 
     return NextResponse.json(
       { message: "User registered successfully" },

@@ -4,12 +4,14 @@ import AvailableDays from "@/components/availableDays/AvailableDays";
 import Button from "@/components/button/Button";
 import Dropdown from "@/components/dropdown/Dropdown";
 import Image from "next/image";
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { GrAnnounce } from "react-icons/gr";
 import { useDispatch, useSelector } from "react-redux";
 import { setAvailability } from "@/store/slices/availabilitySlice";
+import { setUser } from "@/store/slices/userSlice"; // Import setUser
 import { useRouter } from "next/navigation";
 import { RootState } from "@/store/store";
+import { useSession } from "next-auth/react";
 
 const Page = () => {
   const [startTime, setStartTime] = useState("");
@@ -17,12 +19,24 @@ const Page = () => {
   const [selectedDays, setSelectedDays] = useState<string[]>([]);
 
   const user = useSelector((state: RootState) => state.user);
-  // Log the user object to debug
-  console.log("User from Redux store:", user);
-
   const dispatch = useDispatch();
   const router = useRouter();
   const containerRef = useRef<HTMLDivElement>(null);
+  const { data: session, status } = useSession(); // Get session from NextAuth
+
+  // Sync Redux store with NextAuth session on page load
+  useEffect(() => {
+    if (status === "authenticated" && session?.user) {
+      dispatch(
+        setUser({
+          email: session.user.email ?? "",
+          fullName: session.user.fullName ?? "",
+          userName: session.user.userName ?? "",
+          password: "", // Password not stored in session
+        })
+      );
+    }
+  }, [session, status, dispatch]);
 
   const handleContinue = async () => {
     if (!startTime || !endTime || selectedDays.length === 0) {
@@ -30,11 +44,11 @@ const Page = () => {
       return;
     }
 
-    // Log the user object to debug
     console.log("User from Redux store:", user);
 
     if (!user.email) {
-      alert("User email is missing. Please sign up again.");
+      alert("User email is missing. Please sign in again.");
+      router.push("/"); // Redirect to sign-in page
       return;
     }
 
@@ -43,7 +57,7 @@ const Page = () => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          email: user.email, // Ensure this is always present
+          email: user.email,
           startTime,
           endTime,
           availableDays: selectedDays,
@@ -68,7 +82,6 @@ const Page = () => {
 
   return (
     <div className="flex flex-col items-center justify-center my-5 px-4">
-      {/* Logo */}
       <div>
         <Image
           src="/logo.png"
@@ -79,12 +92,10 @@ const Page = () => {
         />
       </div>
 
-      {/* Main form container */}
       <div
         ref={containerRef}
         className="border border-gray-300 py-5 mt-5 flex flex-col w-full max-w-3xl"
       >
-        {/* First section: heading, description, and image */}
         <div className="flex flex-col md:flex-row items-center justify-between px-4 md:px-5">
           <div className="text-center md:text-left mb-4 md:mb-0">
             <h1 className="font-bold text-black">Set your availability</h1>
@@ -93,7 +104,6 @@ const Page = () => {
               <br className="hidden md:block" /> accept meetings.
             </p>
           </div>
-          {/* Image */}
           <div>
             <Image
               src="/hours.png"
@@ -105,10 +115,8 @@ const Page = () => {
           </div>
         </div>
 
-        {/* Divider Line - Takes Full Width of the Main Container */}
         <hr className="border-t border-gray-300 w-full mt-4" />
 
-        {/* Start and End Time Dropdown */}
         <h1 className="font-bold text-black mt-6 md:mt-8 mb-2 px-4 md:px-5">
           Available hours
         </h1>
@@ -127,13 +135,11 @@ const Page = () => {
           />
         </div>
 
-        {/* Available Days */}
         <AvailableDays
           selectedDays={selectedDays}
           setSelectedDays={setSelectedDays}
         />
 
-        {/* Announcement */}
         <div className="mt-5 flex flex-col md:flex-row items-center justify-center gap-y-2 md:gap-y-0 md:gap-x-3 px-4 text-center md:text-left">
           <GrAnnounce size={20} color="black" />
           <p className="text-sm md:text-base">
@@ -143,7 +149,6 @@ const Page = () => {
         </div>
       </div>
 
-      {/* Progressbar & Buttons - Aligned with Main Container */}
       <div className="mt-5 flex flex-col md:flex-row items-center justify-center md:justify-evenly w-full gap-4 md:gap-0">
         <Image
           src="/Progressbar.png"

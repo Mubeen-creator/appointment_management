@@ -1,9 +1,11 @@
-// app/profile/page.tsx
+// Updated profile route page
 "use client";
 
-import { useState } from "react";
-import { useSelector } from "react-redux";
+import { useState, useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/store/store";
+import { logout, setUser } from "@/store/slices/userSlice";
+import { useRouter } from "next/navigation";
 import {
   FiUser,
   FiPenTool,
@@ -20,21 +22,146 @@ import Link from "next/link";
 
 export default function Profile() {
   const user = useSelector((state: RootState) => state.user);
+  const dispatch = useDispatch();
+  const router = useRouter();
 
-  // Form state
-  const [name, setName] = useState("Muhammad Talha");
-  const [welcomeMessage, setWelcomeMessage] = useState(
-    "Welcome to my scheduling page. Please follow the instructions to add an event to my calendar."
-  );
+  // Form state, initializing from Redux user state
+  const [name, setName] = useState("");
+  const [welcomeMessage, setWelcomeMessage] = useState("");
   const [language, setLanguage] = useState("English");
   const [dateFormat, setDateFormat] = useState("DD/MM/YYYY");
   const [timeFormat, setTimeFormat] = useState("12h (am/pm)");
   const [country, setCountry] = useState("Pakistan");
   const [timeZone, setTimeZone] = useState("Pakistan, Mulkisan Time");
+  // const [profilePicture, setProfilePicture] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [profilePicture, setProfilePicture] = useState(
+    user.profilePicture || null
+  );
 
-  const handleSaveChanges = () => {
-    // Handle save logic here
-    console.log("Saving profile changes");
+  // Initialize name with userName on initial load
+  useEffect(() => {
+    if (user.userName) {
+      setName(user.userName); // Set initial name to userName
+    }
+    if (user.welcomeMessage) {
+      setWelcomeMessage(user.welcomeMessage);
+    }
+    if (user.profilePicture) {
+      setProfilePicture(user.profilePicture);
+    }
+  }, [user.userName, user.welcomeMessage, user.profilePicture]);
+
+  const handleLogout = () => {
+    dispatch(logout());
+    router.push("/"); // Redirect to the home or login page after logout
+  };
+
+  // Fetch user data on component mount
+  useEffect(() => {
+    const fetchUserData = async () => {
+      if (!user.email) return;
+
+      try {
+        const response = await fetch(`/api/get-user?email=${user.email}`);
+        if (response.ok) {
+          const userData = await response.json();
+
+          // Update form state with fetched data
+          setName(userData.fullName || "");
+          setWelcomeMessage(userData.welcomeMessage || "");
+          setLanguage(userData.language || "English");
+          setDateFormat(userData.dateFormat || "DD/MM/YYYY");
+          setTimeFormat(userData.timeFormat || "12h (am/pm)");
+          setCountry(userData.country || "Pakistan");
+          setTimeZone(userData.timeZone || "Pakistan, Mulkisan Time");
+          setProfilePicture(userData.profilePicture || null);
+
+          // Update Redux store
+          dispatch(
+            setUser({
+              ...user,
+              fullName: userData.fullName || "",
+              welcomeMessage: userData.welcomeMessage || "",
+              profilePicture: userData.profilePicture || null,
+            })
+          );
+        }
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserData();
+  }, [user.email, dispatch]);
+
+  const handleSaveChanges = async () => {
+    try {
+      const response = await fetch("/api/update-profile", {
+        method: "PUT", // Changed from POST to PUT
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: user.email,
+          fullName: name,
+          welcomeMessage,
+          language,
+          dateFormat,
+          timeFormat,
+          country,
+          timeZone,
+          profilePicture,
+        }),
+      });
+
+      if (response.ok) {
+        alert("Profile updated successfully!");
+        // Update Redux store
+        dispatch(
+          setUser({
+            ...user,
+            fullName: name,
+            welcomeMessage: welcomeMessage,
+            profilePicture: profilePicture,
+          })
+        );
+      } else {
+        alert("Failed to update profile.");
+      }
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      alert("An error occurred while updating the profile.");
+    }
+  };
+
+  const handlePictureUpload = async (event: any) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("profilePicture", file);
+    formData.append("email", user.email); // Assuming email is used to identify the user
+
+    try {
+      const response = await fetch("/api/upload-profile-picture", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        setProfilePicture(result.imageUrl); // Update state with the new image URL
+        alert("Profile picture updated successfully!");
+      } else {
+        alert("Failed to upload profile picture.");
+      }
+    } catch (error) {
+      console.error("Error uploading profile picture:", error);
+      alert("An error occurred while uploading the profile picture.");
+    }
   };
 
   const handleDeleteAccount = () => {
@@ -54,11 +181,11 @@ export default function Profile() {
         </button>
       </div>
 
-      {/* Left Sidebar */}
-      <div className="w-full md:w-64 md:min-h-screen border-r border-gray-200 bg-white">
+      {/* Left Sidebar - Now Fixed */}
+      <div className="w-full md:w-64 md:fixed md:h-screen border-r border-gray-200 bg-white z-10">
         {/* Logo - Desktop Only */}
         <div className="hidden md:flex items-center p-4 border-b border-gray-200">
-          <img src="/calendly-logo.svg" alt="Calendly" className="h-6" />
+          <img src="/logo.png" alt="Calendly" className="h-10" />
         </div>
 
         <div className="p-4">
@@ -115,20 +242,23 @@ export default function Profile() {
           </nav>
         </div>
 
-        <div className="mt-auto border-t border-gray-200 p-4 md:absolute md:bottom-0 md:w-64">
+        <div className="border-t border-gray-200 p-4 absolute bottom-0 w-full">
           <div className="flex items-center py-2 px-3 text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer">
             <FiHelpCircle size={16} className="mr-3" />
             <span className="text-sm">Help</span>
           </div>
-          <div className="flex items-center py-2 px-3 text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer">
+          <div
+            onClick={handleLogout}
+            className="flex items-center py-2 px-3 text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer"
+          >
             <FiLogOut size={16} className="mr-3" />
             <span className="text-sm">Logout</span>
           </div>
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="flex-1 overflow-auto p-4 md:p-8 bg-gray-50">
+      {/* Main Content - With Left Margin to Account for Fixed Sidebar */}
+      <div className="flex-1 md:ml-64 overflow-auto p-4 md:p-8 bg-gray-50">
         <div className="max-w-3xl">
           <div className="flex flex-col mb-6">
             <span className="text-sm text-gray-500">Account details</span>
@@ -139,18 +269,35 @@ export default function Profile() {
             {/* Profile Picture */}
             <div className="flex flex-col md:flex-row items-center md:items-start mb-8">
               <div className="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center mb-4 md:mb-0 md:mr-6">
-                <FiUser size={32} className="text-gray-400" />
+                {profilePicture ? (
+                  <img
+                    src={profilePicture}
+                    alt="Profile"
+                    className="w-full h-full rounded-full object-cover"
+                  />
+                ) : (
+                  <FiUser size={32} className="text-gray-400" />
+                )}
               </div>
               <div>
-                <button className="px-4 py-1 border border-gray-300 rounded-md text-sm">
+                <input
+                  type="file"
+                  id="profilePictureInput"
+                  accept="image/*"
+                  style={{ display: "none" }}
+                  onChange={handlePictureUpload}
+                />
+                <label
+                  htmlFor="profilePictureInput"
+                  className="px-4 py-1 border border-gray-300 rounded-md text-sm cursor-pointer"
+                >
                   Upload picture
-                </button>
+                </label>
                 <p className="text-xs text-gray-500 mt-2">
                   JPG, GIF or PNG. Max size of 5MB.
                 </p>
               </div>
             </div>
-
             {/* Name */}
             <div className="mb-6">
               <div className="flex items-center mb-1">
@@ -170,7 +317,6 @@ export default function Profile() {
                 className="w-full md:w-80 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
             </div>
-
             {/* Welcome Message */}
             <div className="mb-6">
               <div className="flex items-center mb-1">
@@ -190,8 +336,7 @@ export default function Profile() {
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
             </div>
-
-            {/* Language */}
+            ... {/* Language */}
             <div className="mb-6">
               <label
                 htmlFor="language"
@@ -226,7 +371,6 @@ export default function Profile() {
                 </div>
               </div>
             </div>
-
             {/* Date and Time Format */}
             <div className="flex flex-col md:flex-row mb-6">
               <div className="w-full md:w-1/2 md:pr-2 mb-4 md:mb-0">
@@ -301,8 +445,7 @@ export default function Profile() {
                 </div>
               </div>
             </div>
-
-            {/* Country */}
+            ... {/* Country */}
             <div className="mb-6">
               <label
                 htmlFor="country"
@@ -337,7 +480,6 @@ export default function Profile() {
                 </div>
               </div>
             </div>
-
             {/* Time Zone */}
             <div className="mb-6">
               <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-1">
@@ -378,27 +520,27 @@ export default function Profile() {
                 </div>
               </div>
             </div>
+            <button
+              onClick={handleSaveChanges}
+              className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+            >
+              Save changes
+            </button>
+          </div>
 
-            {/* Action Buttons */}
-            <div className="flex flex-col-reverse md:flex-row md:justify-between">
-              <div className="flex mt-4 md:mt-0">
-                <button
-                  onClick={handleSaveChanges}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-md mr-2 text-sm font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  Save Changes
-                </button>
-                <button className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md text-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500">
-                  Cancel
-                </button>
-              </div>
-              <button
-                onClick={handleDeleteAccount}
-                className="px-4 py-2 bg-red-600 text-white rounded-md text-sm font-medium hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
-              >
-                Delete account
-              </button>
-            </div>
+          {/* Delete Account */}
+          <div className="bg-white rounded-md shadow-sm p-6">
+            <h2 className="text-lg font-medium mb-4">Delete Account</h2>
+            <p className="text-gray-600 mb-4">
+              Permanently delete your account and all associated data. This
+              action cannot be undone.
+            </p>
+            <button
+              onClick={handleDeleteAccount}
+              className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50"
+            >
+              Delete Account
+            </button>
           </div>
         </div>
       </div>

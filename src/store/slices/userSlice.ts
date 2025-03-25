@@ -6,6 +6,8 @@ export interface UserState {
   userName: string;
   password: string;
   isAuthenticated: boolean;
+  welcomeMessage?: string;
+  profilePicture?: string | null;
 }
 
 const initialState: UserState = {
@@ -14,6 +16,8 @@ const initialState: UserState = {
   userName: "",
   password: "",
   isAuthenticated: false,
+  welcomeMessage: "",
+  profilePicture: null,
 };
 
 const userSlice = createSlice({
@@ -27,6 +31,8 @@ const userSlice = createSlice({
         fullName: string;
         userName: string;
         password: string;
+        welcomeMessage?: string;
+        profilePicture?: string | null;
       }>
     ) => {
       state.email = action.payload.email;
@@ -34,6 +40,8 @@ const userSlice = createSlice({
       state.userName = action.payload.userName;
       state.password = action.payload.password;
       state.isAuthenticated = true;
+      state.welcomeMessage = action.payload.welcomeMessage;
+      state.profilePicture = action.payload.profilePicture || null;
     },
     logout: (state) => {
       state.email = "";
@@ -41,6 +49,8 @@ const userSlice = createSlice({
       state.userName = "";
       state.password = "";
       state.isAuthenticated = false;
+      state.welcomeMessage = "";
+      state.profilePicture = null;
     },
   },
 });

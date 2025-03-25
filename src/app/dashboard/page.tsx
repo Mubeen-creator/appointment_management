@@ -1,5 +1,5 @@
-// app/profile/page.tsx
 "use client";
+// app/profile/page.tsx
 
 import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
@@ -30,6 +30,7 @@ import {
   setAppointmentsHistory,
   setHostAppointments,
 } from "@/store/slices/appointmentSlice";
+import { useRouter } from "next/navigation";
 
 // Register Chart.js components
 ChartJS.register(
@@ -55,6 +56,12 @@ export default function ScheduledEvents() {
   const hostAppointments = useSelector(
     (state: RootState) => state.appointment.hostAppointments
   );
+  const router = useRouter();
+  const profileRoute = "/profile";
+
+  const handleNavigation = () => {
+    router.push(profileRoute);
+  };
 
   // Fetch appointments when the component mounts
   useEffect(() => {
@@ -186,11 +193,14 @@ export default function ScheduledEvents() {
           </div>
         </div>
         <div className="mt-auto px-2 mb-4">
-          <div className="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-md">
+          <div className="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-md cursor-pointer">
             <FiClock size={18} className="mr-3" />
             <span className="text-sm font-medium">Availability</span>
           </div>
-          <div className="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-md mt-1">
+          <div
+            className="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-md mt-1 cursor-pointer"
+            onClick={handleNavigation}
+          >
             <FiSettings size={18} className="mr-3" />
             <span className="text-sm font-medium">Admin center</span>
           </div>

@@ -7,7 +7,6 @@ import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { setUser } from "../store/slices/userSlice";
 import { useRouter } from "next/navigation";
-import { signIn } from "next-auth/react";
 
 export default function Home() {
   const [email, setEmail] = useState("");
@@ -71,7 +70,7 @@ export default function Home() {
             password: user.password,
           })
         );
-        router.push("/availibilityHours");
+        router.push("/dashboard");
       }
     } catch (error) {
       console.error("Error during sign-in:", error);

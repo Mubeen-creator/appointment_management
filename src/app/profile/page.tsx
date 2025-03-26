@@ -189,7 +189,10 @@ export default function Profile() {
         </div>
 
         <div className="p-4">
-          <Link href="/home" className="flex items-center text-blue-600 mb-6">
+          <Link
+            href="/dashboard"
+            className="flex items-center text-blue-600 mb-6"
+          >
             <FiChevronLeft size={16} className="mr-2" />
             <span className="text-sm">Back to home</span>
           </Link>

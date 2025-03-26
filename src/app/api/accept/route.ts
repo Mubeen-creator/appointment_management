@@ -1,3 +1,4 @@
+// app/api/accept/route.ts
 import clientPromise from "@/app/lib/mongodb";
 import { NextResponse } from "next/server";
 

@@ -1,6 +1,5 @@
+// src/app/dashboard/page.tsx
 "use client";
-// app/profile/page.tsx
-
 import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/store/store";
@@ -42,12 +41,28 @@ ChartJS.register(
   Legend
 );
 
+// Define Appointment interface
+interface Appointment {
+  _id: string;
+  date: string;
+  time: string;
+  status: "pending" | "accepted" | "rejected";
+  requesterEmail: string;
+  hostEmail: string;
+  message?: string;
+  timeZone?: string;
+}
+
 export default function ScheduledEvents() {
   const [activeTab, setActiveTab] = useState("Upcoming");
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [activeSidebarOption, setActiveSidebarOption] =
     useState("Scheduled events");
-  const [dropdownOption, setDropdownOption] = useState("My Calendly"); // New state for dropdown
+  const [dropdownOption, setDropdownOption] = useState("My Calendly");
+  const [selectedAppointment, setSelectedAppointment] =
+    useState<Appointment | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const dispatch = useDispatch();
   const user = useSelector((state: RootState) => state.user);
   const appointmentsHistory = useSelector(
@@ -63,7 +78,6 @@ export default function ScheduledEvents() {
     router.push(profileRoute);
   };
 
-  // Fetch appointments when the component mounts
   useEffect(() => {
     const fetchAppointments = async () => {
       try {
@@ -71,7 +85,6 @@ export default function ScheduledEvents() {
         const data = await response.json();
         dispatch(setAppointmentsHistory(data));
 
-        // Fetch appointments where the user is the host
         const hostResponse = await fetch(
           `/api/appointments?hostEmail=${user.email}`
         );
@@ -87,7 +100,50 @@ export default function ScheduledEvents() {
     }
   }, [user.email, dispatch]);
 
-  // Generate bar graph data from appointments
+  const handleUpdateStatus = async (
+    appointmentId: string,
+    newStatus: string
+  ) => {
+    try {
+      if (!selectedAppointment) return;
+
+      const response = await fetch("/api/update-appointment-status", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          appointmentId,
+          status: newStatus,
+          requesterEmail: selectedAppointment.requesterEmail,
+        }),
+      });
+
+      if (response.ok) {
+        const [updatedAppointments, updatedHostAppointments] =
+          await Promise.all([
+            fetch(`/api/appointments?email=${user.email}`).then((res) =>
+              res.json()
+            ),
+            fetch(`/api/appointments?hostEmail=${user.email}`).then((res) =>
+              res.json()
+            ),
+          ]);
+
+        dispatch(setAppointmentsHistory(updatedAppointments));
+        dispatch(setHostAppointments(updatedHostAppointments));
+        setIsModalOpen(false);
+      }
+    } catch (error) {
+      console.error("Error updating appointment status:", error);
+    }
+  };
+
+  const openModal = (appointment: Appointment) => {
+    setSelectedAppointment(appointment);
+    setIsModalOpen(true);
+  };
+
   const generateBarGraphData = () => {
     const appointmentsPerMonth = Array(12).fill(0);
 
@@ -124,23 +180,16 @@ export default function ScheduledEvents() {
   };
 
   const data = generateBarGraphData();
-
   const options = {
     responsive: true,
     plugins: {
-      legend: {
-        position: "top" as const,
-      },
-      title: {
-        display: true,
-        text: "Appointment Analytics",
-      },
+      legend: { position: "top" as const },
+      title: { display: true, text: "Appointment Analytics" },
     },
   };
 
   return (
     <div className="flex h-screen relative">
-      {/* Overlay for mobile when sidebar is open */}
       {sidebarOpen && (
         <div
           className="fixed inset-0 bg-gray-300 bg-opacity-50 z-20 md:hidden opacity-25"
@@ -227,17 +276,14 @@ export default function ScheduledEvents() {
             </div>
           </div>
 
-          {/* Show Analytics Graph if Analytics is clicked */}
           {activeSidebarOption === "Analytics" && (
             <div className="bg-white rounded-md shadow-sm p-4 mb-4">
               <Bar data={data} options={options} />
             </div>
           )}
 
-          {/* Show Default Content if Scheduled Events is clicked */}
           {activeSidebarOption === "Scheduled events" && (
             <>
-              {/* Calendar Selection */}
               <div className="bg-white rounded-md shadow-sm p-4 mb-4">
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center space-y-2 md:space-y-0">
                   <div className="relative">
@@ -270,7 +316,6 @@ export default function ScheduledEvents() {
                 </div>
               </div>
 
-              {/* Tabs and Actions */}
               <div className="bg-white rounded-t-md shadow-sm">
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center px-4 pt-4">
                   <div className="flex overflow-x-auto scrollbar-hide border-b border-gray-200 w-full">
@@ -327,7 +372,6 @@ export default function ScheduledEvents() {
                   </div>
                 </div>
 
-                {/* Event List */}
                 <div className="p-4">
                   <div className="text-sm font-medium text-gray-600 mb-4">
                     {new Date().toLocaleDateString("en-US", {
@@ -366,13 +410,15 @@ export default function ScheduledEvents() {
                             <div className="text-sm text-gray-600">
                               1 host | 0 non-hosts
                             </div>
+                            <button
+                              onClick={() => openModal(appointment)}
+                              className="text-blue-600 hover:text-blue-800 text-sm cursor-pointer"
+                            >
+                              Details
+                            </button>
                           </div>
                         </div>
                       </div>
-                      <button className="ml-2 md:ml-4 text-gray-500 hover:text-gray-800 flex-shrink-0">
-                        <span className="hidden md:inline">Details</span>
-                        <FiChevronRight size={20} />
-                      </button>
                     </div>
                   ))}
 
@@ -382,6 +428,79 @@ export default function ScheduledEvents() {
                 </div>
               </div>
             </>
+          )}
+
+          {/* Modal */}
+          {isModalOpen && selectedAppointment && (
+            <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
+              <div className="bg-white p-6 rounded-lg max-w-md w-full">
+                <h2 className="text-lg font-semibold mb-4">
+                  Appointment Details
+                </h2>
+                <p>
+                  <strong>Date:</strong> {selectedAppointment.date}
+                </p>
+                <p>
+                  <strong>Time:</strong> {selectedAppointment.time}
+                </p>
+                <p>
+                  <strong>Status:</strong> {selectedAppointment.status}
+                </p>
+                <p>
+                  <strong>Requester:</strong>{" "}
+                  {selectedAppointment.requesterEmail}
+                </p>
+                <p>
+                  <strong>Host:</strong> {selectedAppointment.hostEmail}
+                </p>
+                {selectedAppointment.message && (
+                  <p>
+                    <strong>Message:</strong> {selectedAppointment.message}
+                  </p>
+                )}
+                {selectedAppointment.timeZone && (
+                  <p>
+                    <strong>Time Zone:</strong> {selectedAppointment.timeZone}
+                  </p>
+                )}
+
+                {dropdownOption === "Requests to Me" && (
+                  <div className="mt-4 space-x-2">
+                    <button
+                      onClick={() =>
+                        handleUpdateStatus(selectedAppointment._id, "accepted")
+                      }
+                      className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+                    >
+                      Accept
+                    </button>
+                    <button
+                      onClick={() =>
+                        handleUpdateStatus(selectedAppointment._id, "rejected")
+                      }
+                      className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                    >
+                      Reject
+                    </button>
+                    <button
+                      onClick={() =>
+                        handleUpdateStatus(selectedAppointment._id, "pending")
+                      }
+                      className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+                    >
+                      Mark as Pending
+                    </button>
+                  </div>
+                )}
+
+                <button
+                  onClick={() => setIsModalOpen(false)}
+                  className="mt-4 px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
           )}
         </div>
       </div>

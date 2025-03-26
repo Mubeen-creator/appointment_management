@@ -1,7 +1,7 @@
-// store/slices/appointmentSlice.ts
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface Appointment {
+  _id?: string; // Add _id as an optional field to match MongoDB
   date: string;
   time: string;
   requesterEmail: string;
@@ -58,9 +58,26 @@ const appointmentSlice = createSlice({
     },
     updateAppointmentStatus: (
       state,
-      action: PayloadAction<"accepted" | "rejected">
+      action: PayloadAction<{
+        id: string;
+        status: "pending" | "accepted" | "rejected";
+      }>
     ) => {
-      state.currentAppointment.status = action.payload;
+      const { id, status } = action.payload;
+      // Update in appointmentsHistory
+      const historyIndex = state.appointmentsHistory.findIndex(
+        (appt) => appt._id === id
+      );
+      if (historyIndex !== -1) {
+        state.appointmentsHistory[historyIndex].status = status;
+      }
+      // Update in hostAppointments
+      const hostIndex = state.hostAppointments.findIndex(
+        (appt) => appt._id === id
+      );
+      if (hostIndex !== -1) {
+        state.hostAppointments[hostIndex].status = status;
+      }
     },
     setAppointmentsHistory: (state, action: PayloadAction<Appointment[]>) => {
       state.appointmentsHistory = action.payload;
@@ -76,6 +93,6 @@ export const {
   addAppointmentToHistory,
   updateAppointmentStatus,
   setAppointmentsHistory,
-  setHostAppointments, // Export the new action
+  setHostAppointments,
 } = appointmentSlice.actions;
 export default appointmentSlice.reducer;

@@ -1,32 +1,16 @@
 "use client";
 
 import Header from "@/components/header/Header";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { TiTick } from "react-icons/ti";
 import { MdOutlineOpenInNew } from "react-icons/md";
 import { CiUser, CiCalendar } from "react-icons/ci";
 import { BiBaseball } from "react-icons/bi";
-import { useSelector } from "react-redux";
-import { RootState } from "@/store/store";
-import { useRouter } from "next/navigation";
+import useConfirmation from "./useMeeting-confirmation";
 
 const Page = () => {
-  const appointment = useSelector((state: RootState) => state.appointment);
-  const router = useRouter();
-  const [countdown, setCountdown] = useState(3); // Countdown timer (in seconds)
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCountdown((prev) => prev - 1);
-    }, 1000);
-
-    if (countdown === 0) {
-      clearInterval(timer);
-      router.push("/dashboard"); // Redirect to dashboard
-    }
-
-    return () => clearInterval(timer);
-  }, [countdown, router]);
+  const { appointment, router, countdown, setCountdown, useEffect } =
+    useConfirmation();
 
   return (
     <div className="bg-gray-100 min-h-screen flex flex-col">

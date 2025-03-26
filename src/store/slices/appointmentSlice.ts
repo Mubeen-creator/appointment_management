@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-interface Appointment {
+export interface Appointment {
   _id?: string; // Add _id as an optional field to match MongoDB
   date: string;
   time: string;
@@ -9,6 +9,9 @@ interface Appointment {
   message: string;
   status: "pending" | "accepted" | "rejected";
   tag?: "Sent" | "Received"; // Add tag as an optional field
+  timeZone?: "string";
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 interface AppointmentState {

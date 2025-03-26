@@ -8,6 +8,7 @@ interface Appointment {
   hostEmail: string;
   message: string;
   status: "pending" | "accepted" | "rejected";
+  tag?: "Sent" | "Received"; // Add tag as an optional field
 }
 
 interface AppointmentState {
@@ -24,6 +25,7 @@ const initialState: AppointmentState = {
     hostEmail: "",
     message: "",
     status: "pending",
+    tag: undefined, // Initialize tag as undefined
   },
   appointmentsHistory: [],
   hostAppointments: [], // Initialize host appointments
@@ -50,6 +52,7 @@ const appointmentSlice = createSlice({
         hostEmail: action.payload.hostEmail,
         message: action.payload.message,
         status: "pending",
+        tag: undefined, // Tag is not set here, as it's not part of the initial creation
       };
     },
     addAppointmentToHistory: (state) => {
@@ -80,10 +83,16 @@ const appointmentSlice = createSlice({
       }
     },
     setAppointmentsHistory: (state, action: PayloadAction<Appointment[]>) => {
-      state.appointmentsHistory = action.payload;
+      state.appointmentsHistory = action.payload.map((appt) => ({
+        ...appt,
+        tag: "Sent", // Default tag for appointmentsHistory
+      }));
     },
     setHostAppointments: (state, action: PayloadAction<Appointment[]>) => {
-      state.hostAppointments = action.payload; // Set host appointments
+      state.hostAppointments = action.payload.map((appt) => ({
+        ...appt,
+        tag: "Received", // Default tag for hostAppointments
+      }));
     },
   },
 });

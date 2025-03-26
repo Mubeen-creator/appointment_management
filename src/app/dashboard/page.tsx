@@ -1,4 +1,3 @@
-// src/app/dashboard/page.tsx
 "use client";
 import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
@@ -30,6 +29,9 @@ import {
   setHostAppointments,
 } from "@/store/slices/appointmentSlice";
 import { useRouter } from "next/navigation";
+import DatePicker from "react-datepicker";
+import { saveAs } from "file-saver";
+import { parse, format } from "date-fns";
 
 // Register Chart.js components
 ChartJS.register(
@@ -41,9 +43,8 @@ ChartJS.register(
   Legend
 );
 
-// Define Appointment interface
 interface Appointment {
-  _id: string;
+  _id?: string;
   date: string;
   time: string;
   status: "pending" | "accepted" | "rejected";
@@ -51,6 +52,9 @@ interface Appointment {
   hostEmail: string;
   message?: string;
   timeZone?: string;
+  tag: "Sent" | "Received";
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export default function ScheduledEvents() {
@@ -58,10 +62,11 @@ export default function ScheduledEvents() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [activeSidebarOption, setActiveSidebarOption] =
     useState("Scheduled events");
-  const [dropdownOption, setDropdownOption] = useState("My Calendly");
   const [selectedAppointment, setSelectedAppointment] =
     useState<Appointment | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [startDate, setStartDate] = useState<Date | null>(null);
+  const [endDate, setEndDate] = useState<Date | null>(null);
 
   const dispatch = useDispatch();
   const user = useSelector((state: RootState) => state.user);
@@ -146,8 +151,9 @@ export default function ScheduledEvents() {
 
   const generateBarGraphData = () => {
     const appointmentsPerMonth = Array(12).fill(0);
+    const allAppointments = [...appointmentsHistory, ...hostAppointments];
 
-    appointmentsHistory.forEach((appointment) => {
+    allAppointments.forEach((appointment) => {
       const month = new Date(appointment.date).getMonth();
       appointmentsPerMonth[month]++;
     });
@@ -188,8 +194,114 @@ export default function ScheduledEvents() {
     },
   };
 
+  const allAppointments = [...appointmentsHistory, ...hostAppointments];
+
+  const filteredAppointments = allAppointments.filter((appointment) => {
+    const today = new Date("2025-03-26"); // Replace with new Date() in production
+    const appointmentDate = new Date(appointment.date);
+
+    switch (activeTab) {
+      case "Upcoming":
+        return appointmentDate >= today;
+      case "Pending":
+        return appointment.status === "pending";
+      case "Past":
+        return appointmentDate < today;
+      case "DateRange":
+        if (!startDate || !endDate) return true;
+        return appointmentDate >= startDate && appointmentDate <= endDate;
+      default:
+        return true;
+    }
+  });
+
+  const exportToICS = () => {
+    const icsContent = [
+      "BEGIN:VCALENDAR",
+      "VERSION:2.0",
+      "PRODID:-//xAI//Grok 3//EN",
+      ...filteredAppointments.map((appointment) => {
+        const startDateTime = parse(
+          `${appointment.date} ${appointment.time}`,
+          "yyyy-MM-dd h:mma",
+          new Date()
+        );
+        const endDateTime = new Date(startDateTime.getTime() + 30 * 60 * 1000);
+
+        const formatICSDate = (date: Date) =>
+          format(date, "yyyyMMdd'T'HHmmss'Z'");
+
+        return [
+          "BEGIN:VEVENT",
+          `UID:${appointment._id}`,
+          `DTSTART:${formatICSDate(startDateTime)}`,
+          `DTEND:${formatICSDate(endDateTime)}`,
+          `SUMMARY:Meeting with ${
+            appointment.tag === "Sent"
+              ? appointment.hostEmail
+              : appointment.requesterEmail
+          }`,
+          `DESCRIPTION:${appointment.message || "No message"}`,
+          `ORGANIZER;CN=${appointment.hostEmail}:mailto:${appointment.hostEmail}`,
+          `ATTENDEE;CN=${appointment.requesterEmail}:mailto:${appointment.requesterEmail}`,
+          "STATUS:CONFIRMED",
+          "END:VEVENT",
+        ].join("\r\n");
+      }),
+      "END:VCALENDAR",
+    ].join("\r\n");
+
+    const blob = new Blob([icsContent], {
+      type: "text/calendar;charset=utf-8",
+    });
+    saveAs(blob, "appointments.ics");
+  };
+
+  const datePickerStyles = `
+    .react-datepicker-wrapper {
+      display: block;
+    }
+    .react-datepicker__input-container input {
+      background-color: white;
+      cursor: pointer;
+      width: 100%;
+      outline: none;
+    }
+    .react-datepicker__input-container input:hover {
+      border-color: #2563eb;
+    }
+    .react-datepicker {
+      font-family: Arial, sans-serif;
+      border: 1px solid #e5e7eb;
+      border-radius: 0.375rem;
+      background-color: #ffffff;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    .react-datepicker__month-container {
+      max-height: 300px; /* Fixed height less than screen */
+      overflow-y: auto; /* Scrollable */
+    }
+    .react-datepicker__header {
+      background-color: #f9fafb;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    .react-datepicker__day-name, .react-datepicker__day {
+      width: 2rem;
+      line-height: 2rem;
+      text-align: center;
+    }
+    .react-datepicker__day--selected, .react-datepicker__day--in-range {
+      background-color: #2563eb;
+      color: white;
+    }
+    .react-datepicker__day--outside-month {
+      color: #9ca3af;
+    }
+  `;
+
   return (
     <div className="flex h-screen relative">
+      <style>{datePickerStyles}</style>
       {sidebarOpen && (
         <div
           className="fixed inset-0 bg-gray-300 bg-opacity-50 z-20 md:hidden opacity-25"
@@ -286,32 +398,12 @@ export default function ScheduledEvents() {
             <>
               <div className="bg-white rounded-md shadow-sm p-4 mb-4">
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center space-y-2 md:space-y-0">
-                  <div className="relative">
-                    <select
-                      className="appearance-none bg-transparent pr-8 pl-2 py-1 border border-gray-300 rounded-md text-sm"
-                      value={dropdownOption}
-                      onChange={(e) => setDropdownOption(e.target.value)}
-                    >
-                      <option value="My Calendly">My Calendly</option>
-                      <option value="Requests to Me">Requests to Me</option>
-                    </select>
-                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                      <FiChevronRight
-                        size={14}
-                        className="transform rotate-90"
-                      />
-                    </div>
+                  <div className="text-sm font-medium text-gray-700">
+                    My Calendly's
                   </div>
                   <div className="text-sm text-gray-500">
-                    Displaying{" "}
-                    {dropdownOption === "My Calendly"
-                      ? appointmentsHistory.length
-                      : hostAppointments.length}{" "}
-                    of{" "}
-                    {dropdownOption === "My Calendly"
-                      ? appointmentsHistory.length
-                      : hostAppointments.length}{" "}
-                    Events
+                    Displaying {filteredAppointments.length} of{" "}
+                    {allAppointments.length} Events
                   </div>
                 </div>
               </div>
@@ -352,7 +444,7 @@ export default function ScheduledEvents() {
                     <button
                       className={`py-2 px-4 text-sm whitespace-nowrap ${
                         activeTab === "DateRange"
-                          ? "border-b-2 border-blue-600 text-blue-600"
+                          ? "border-b-2 border-blue-600 cursor-pointer text-blue-600"
                           : "text-gray-500"
                       }`}
                       onClick={() => setActiveTab("DateRange")}
@@ -361,7 +453,10 @@ export default function ScheduledEvents() {
                     </button>
                   </div>
                   <div className="flex items-center mt-4 md:mt-0 w-full md:w-auto justify-end">
-                    <button className="mr-2 px-4 py-1 text-sm border border-gray-300 rounded-md flex items-center hover:bg-gray-50">
+                    <button
+                      onClick={exportToICS}
+                      className="mr-2 px-4 py-1 text-sm border border-gray-300 rounded-md flex items-center hover:bg-gray-50"
+                    >
                       <FiDownload size={16} className="mr-2" />
                       Export
                     </button>
@@ -372,6 +467,38 @@ export default function ScheduledEvents() {
                   </div>
                 </div>
 
+                {activeTab === "DateRange" && (
+                  <div className="p-4 flex space-x-4">
+                    <div>
+                      <label className="text-sm text-gray-600">
+                        Start Date:
+                      </label>
+                      <DatePicker
+                        selected={startDate}
+                        onChange={(date: Date | null) => setStartDate(date)}
+                        selectsStart
+                        startDate={startDate}
+                        endDate={endDate}
+                        className="mt-1 p-2 border border-gray-300 rounded-md"
+                        placeholderText="Select start date"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-sm text-gray-600">End Date:</label>
+                      <DatePicker
+                        selected={endDate}
+                        onChange={(date: Date | null) => setEndDate(date)}
+                        selectsEnd
+                        startDate={startDate}
+                        endDate={endDate}
+                        minDate={startDate || undefined}
+                        className="mt-1 p-2 border border-gray-300 rounded-md"
+                        placeholderText="Select end date"
+                      />
+                    </div>
+                  </div>
+                )}
+
                 <div className="p-4">
                   <div className="text-sm font-medium text-gray-600 mb-4">
                     {new Date().toLocaleDateString("en-US", {
@@ -381,10 +508,7 @@ export default function ScheduledEvents() {
                     })}
                   </div>
 
-                  {(dropdownOption === "My Calendly"
-                    ? appointmentsHistory
-                    : hostAppointments
-                  ).map((appointment, index) => (
+                  {filteredAppointments.map((appointment, index) => (
                     <div
                       key={index}
                       className="flex items-center mb-4 border border-gray-200 rounded-md p-3 hover:bg-gray-50"
@@ -398,9 +522,18 @@ export default function ScheduledEvents() {
                             </div>
                             <div className="font-medium">
                               Meeting with{" "}
-                              {dropdownOption === "My Calendly"
+                              {appointment.tag === "Sent"
                                 ? appointment.hostEmail
                                 : appointment.requesterEmail}
+                              <span
+                                className={`ml-2 inline-block px-2 py-1 text-xs font-semibold rounded-full ${
+                                  appointment.tag === "Sent"
+                                    ? "bg-green-100 text-green-800"
+                                    : "bg-blue-100 text-blue-800"
+                                }`}
+                              >
+                                {appointment.tag}
+                              </span>
                             </div>
                             <div className="text-sm text-gray-600">
                               Event type: 30 Minute Meeting
@@ -422,9 +555,17 @@ export default function ScheduledEvents() {
                     </div>
                   ))}
 
-                  <div className="text-center text-sm text-gray-500 py-4">
-                    You've reached the end of the list
-                  </div>
+                  {filteredAppointments.length === 0 && (
+                    <div className="text-center text-sm text-gray-500 py-4">
+                      No appointments found for this category
+                    </div>
+                  )}
+
+                  {filteredAppointments.length > 0 && (
+                    <div className="text-center text-sm text-gray-500 py-4">
+                      You've reached the end of the list
+                    </div>
+                  )}
                 </div>
               </div>
             </>
@@ -453,6 +594,9 @@ export default function ScheduledEvents() {
                 <p>
                   <strong>Host:</strong> {selectedAppointment.hostEmail}
                 </p>
+                <p>
+                  <strong>Type:</strong> {selectedAppointment.tag}
+                </p>
                 {selectedAppointment.message && (
                   <p>
                     <strong>Message:</strong> {selectedAppointment.message}
@@ -464,11 +608,11 @@ export default function ScheduledEvents() {
                   </p>
                 )}
 
-                {dropdownOption === "Requests to Me" && (
+                {selectedAppointment.tag === "Received" && (
                   <div className="mt-4 space-x-2">
                     <button
                       onClick={() =>
-                        handleUpdateStatus(selectedAppointment._id, "accepted")
+                        handleUpdateStatus(selectedAppointment._id!, "accepted")
                       }
                       className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
                     >
@@ -476,7 +620,7 @@ export default function ScheduledEvents() {
                     </button>
                     <button
                       onClick={() =>
-                        handleUpdateStatus(selectedAppointment._id, "rejected")
+                        handleUpdateStatus(selectedAppointment._id!, "rejected")
                       }
                       className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
                     >
@@ -484,7 +628,7 @@ export default function ScheduledEvents() {
                     </button>
                     <button
                       onClick={() =>
-                        handleUpdateStatus(selectedAppointment._id, "pending")
+                        handleUpdateStatus(selectedAppointment._id!, "pending")
                       }
                       className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
                     >

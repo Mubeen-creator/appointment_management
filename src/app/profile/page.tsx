@@ -84,7 +84,7 @@ export default function Profile() {
               <span className="text-sm">Profile</span>
             </Link>
             <Link
-              href="/branding"
+              href=""
               className="flex items-center py-2 px-3 text-gray-700 hover:bg-gray-50 rounded-md"
             >
               <FiPenTool size={16} className="mr-3" />
@@ -98,21 +98,21 @@ export default function Profile() {
               <span className="text-sm">My Link</span>
             </Link>
             <Link
-              href="/login-preferences"
+              href=""
               className="flex items-center py-2 px-3 text-gray-700 hover:bg-gray-50 rounded-md"
             >
               <FiLock size={16} className="mr-3" />
               <span className="text-sm">Login preferences</span>
             </Link>
             <Link
-              href="/cookie-settings"
+              href=""
               className="flex items-center py-2 px-3 text-gray-700 hover:bg-gray-50 rounded-md"
             >
               <FiSettings size={16} className="mr-3" />
               <span className="text-sm">Cookie settings</span>
             </Link>
             <Link
-              href="/calendar-sync"
+              href=""
               className="flex items-center py-2 px-3 text-gray-700 hover:bg-gray-50 rounded-md"
             >
               <FiCalendar size={16} className="mr-3" />

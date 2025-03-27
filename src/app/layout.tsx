@@ -8,6 +8,7 @@ import { SessionProvider, useSession } from "next-auth/react";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { setUser } from "../store/slices/userSlice";
+import { ToastContainer } from "react-toastify";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -54,6 +55,7 @@ export default function RootLayout({
           <Provider store={store}>
             <SessionSync />
             {children}
+            <ToastContainer position="top-right" autoClose={3000} />
           </Provider>
         </SessionProvider>
       </body>

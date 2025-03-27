@@ -125,7 +125,10 @@ export default function ScheduledEvents() {
           </div>
         </div>
         <div className="mt-auto px-2 mb-4">
-          <div className="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-md cursor-pointer">
+          <div
+            className="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-md cursor-pointer"
+            onClick={() => router.push("/editAvailability")}
+          >
             <FiClock size={18} className="mr-3" />
             <span className="text-sm font-medium">Availability</span>
           </div>

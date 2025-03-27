@@ -1,8 +1,14 @@
-// src/app/api/update-appointment-status/route.ts
 import clientPromise from "@/app/lib/mongodb";
 import { NextResponse } from "next/server";
 import { ObjectId } from "mongodb";
 import nodemailer from "nodemailer";
+
+// Simulated Google Meet link generator (replace with actual Google API integration)
+const generateGoogleMeetLink = () => {
+  return `https://meet.google.com/abc-${Math.random()
+    .toString(36)
+    .substring(2, 10)}`;
+};
 
 export async function POST(request: Request) {
   console.log(
@@ -33,20 +39,12 @@ export async function POST(request: Request) {
       );
     }
 
-    console.log("[API] Connecting to MongoDB...");
     const client = await clientPromise;
     const db = client.db("appointmentManagement");
-
-    console.log("[API] Database connected. Using database:", db.databaseName);
-    console.log(
-      "[API] Available collections:",
-      await db.collections().then((cols) => cols.map((c) => c.collectionName))
-    );
 
     let objectId;
     try {
       objectId = new ObjectId(appointmentId);
-      console.log("[API] Converted appointmentId to ObjectId:", objectId);
     } catch (error) {
       console.log("[API] Invalid ObjectId format:", appointmentId);
       return NextResponse.json(
@@ -58,8 +56,6 @@ export async function POST(request: Request) {
     const existingDoc = await db
       .collection("appointments")
       .findOne({ _id: objectId });
-    console.log("[API] Existing document check:", existingDoc);
-
     if (!existingDoc) {
       console.log("[API] No document found for ID:", appointmentId);
       return NextResponse.json(
@@ -68,21 +64,25 @@ export async function POST(request: Request) {
       );
     }
 
-    console.log("[API] Updating appointment with ID:", appointmentId);
-    const result = await db.collection("appointments").findOneAndUpdate(
-      { _id: objectId },
-      {
-        $set: {
-          status,
-          updatedAt: new Date(),
-        },
-      },
-      { returnDocument: "after" }
-    );
+    // Generate Google Meet link if status is "accepted"
+    const updateData: any = {
+      status,
+      updatedAt: new Date(),
+    };
+    let meetLink = existingDoc.meetLink;
+    if (status === "accepted" && !meetLink) {
+      meetLink = generateGoogleMeetLink();
+      updateData.meetLink = meetLink;
+    }
 
-    console.log("[API] Update result:", result);
+    const result = await db
+      .collection("appointments")
+      .findOneAndUpdate(
+        { _id: objectId },
+        { $set: updateData },
+        { returnDocument: "after" }
+      );
 
-    // Check if the update operation failed
     if (!result || !result.value) {
       console.log("[API] Update operation failed for ID:", appointmentId);
       return NextResponse.json(
@@ -114,6 +114,11 @@ export async function POST(request: Request) {
         Time: ${updatedDoc.time}
         Host: ${updatedDoc.hostEmail}
         Message: ${updatedDoc.message || "No message provided"}
+        ${
+          status === "accepted" && meetLink
+            ? `Google Meet Link: ${meetLink}`
+            : ""
+        }
       `;
 
       const mailOptions = {
@@ -122,6 +127,26 @@ export async function POST(request: Request) {
         subject,
         text: emailContent,
       };
+
+      // Send email to host as well if accepted
+      if (status === "accepted" && meetLink) {
+        const hostMailOptions = {
+          ...mailOptions,
+          to: updatedDoc.hostEmail,
+          text: `
+            Hi,
+
+            You have accepted an appointment.
+
+            Date: ${updatedDoc.date}
+            Time: ${updatedDoc.time}
+            Requester: ${updatedDoc.requesterEmail}
+            Message: ${updatedDoc.message || "No message provided"}
+            Google Meet Link: ${meetLink}
+          `,
+        };
+        await transporter.sendMail(hostMailOptions);
+      }
 
       console.log("[API] Sending email notification to:", requesterEmail);
       try {

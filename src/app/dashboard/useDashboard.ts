@@ -6,6 +6,7 @@ import { RootState } from "@/store/store";
 import {
   setAppointmentsHistory,
   setHostAppointments,
+  updateAppointmentStatus,
 } from "@/store/slices/appointmentSlice";
 import { useRouter } from "next/navigation";
 import { saveAs } from "file-saver";
@@ -80,6 +81,7 @@ const useDashboard = () => {
       });
 
       if (response.ok) {
+        const updatedAppointment = await response.json();
         const [updatedAppointments, updatedHostAppointments] =
           await Promise.all([
             fetch(`/api/appointments?email=${user.email}`).then((res) =>
@@ -92,6 +94,13 @@ const useDashboard = () => {
 
         dispatch(setAppointmentsHistory(updatedAppointments));
         dispatch(setHostAppointments(updatedHostAppointments));
+        dispatch(
+          updateAppointmentStatus({
+            id: appointmentId,
+            status: newStatus as "pending" | "accepted" | "rejected",
+            meetLink: updatedAppointment.meetLink, // Update Redux with meetLink
+          })
+        );
         setIsModalOpen(false);
       }
     } catch (error) {

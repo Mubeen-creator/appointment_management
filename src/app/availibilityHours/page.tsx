@@ -104,7 +104,10 @@ const Page = () => {
           className="object-contain"
         />
         <div className="flex items-center mt-4 md:mt-0">
-          <button className="pr-4 cursor-pointer text-sm md:text-base">
+          <button
+            className="pr-4 cursor-pointer text-sm md:text-base"
+            onClick={() => router.push("/schedule")}
+          >
             Set up later
           </button>
           <Button

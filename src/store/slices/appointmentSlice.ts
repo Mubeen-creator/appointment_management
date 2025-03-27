@@ -1,23 +1,24 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 export interface Appointment {
-  _id?: string; // Add _id as an optional field to match MongoDB
+  _id?: string;
   date: string;
   time: string;
   requesterEmail: string;
   hostEmail: string;
   message: string;
   status: "pending" | "accepted" | "rejected";
-  tag?: "Sent" | "Received"; // Add tag as an optional field
-  timeZone?: "string";
+  tag?: "Sent" | "Received";
+  timeZone?: string;
   createdAt?: string;
   updatedAt?: string;
+  meetLink?: string; // Add meetLink field
 }
 
 interface AppointmentState {
   currentAppointment: Appointment;
   appointmentsHistory: Appointment[];
-  hostAppointments: Appointment[]; // New state for host appointments
+  hostAppointments: Appointment[];
 }
 
 const initialState: AppointmentState = {
@@ -28,10 +29,11 @@ const initialState: AppointmentState = {
     hostEmail: "",
     message: "",
     status: "pending",
-    tag: undefined, // Initialize tag as undefined
+    tag: undefined,
+    meetLink: undefined, // Initialize meetLink
   },
   appointmentsHistory: [],
-  hostAppointments: [], // Initialize host appointments
+  hostAppointments: [],
 };
 
 const appointmentSlice = createSlice({
@@ -55,7 +57,8 @@ const appointmentSlice = createSlice({
         hostEmail: action.payload.hostEmail,
         message: action.payload.message,
         status: "pending",
-        tag: undefined, // Tag is not set here, as it's not part of the initial creation
+        tag: undefined,
+        meetLink: undefined,
       };
     },
     addAppointmentToHistory: (state) => {
@@ -67,34 +70,36 @@ const appointmentSlice = createSlice({
       action: PayloadAction<{
         id: string;
         status: "pending" | "accepted" | "rejected";
+        meetLink?: string; // Add meetLink to update
       }>
     ) => {
-      const { id, status } = action.payload;
-      // Update in appointmentsHistory
+      const { id, status, meetLink } = action.payload;
       const historyIndex = state.appointmentsHistory.findIndex(
         (appt) => appt._id === id
       );
       if (historyIndex !== -1) {
         state.appointmentsHistory[historyIndex].status = status;
+        if (meetLink)
+          state.appointmentsHistory[historyIndex].meetLink = meetLink;
       }
-      // Update in hostAppointments
       const hostIndex = state.hostAppointments.findIndex(
         (appt) => appt._id === id
       );
       if (hostIndex !== -1) {
         state.hostAppointments[hostIndex].status = status;
+        if (meetLink) state.hostAppointments[hostIndex].meetLink = meetLink;
       }
     },
     setAppointmentsHistory: (state, action: PayloadAction<Appointment[]>) => {
       state.appointmentsHistory = action.payload.map((appt) => ({
         ...appt,
-        tag: "Sent", // Default tag for appointmentsHistory
+        tag: "Sent",
       }));
     },
     setHostAppointments: (state, action: PayloadAction<Appointment[]>) => {
       state.hostAppointments = action.payload.map((appt) => ({
         ...appt,
-        tag: "Received", // Default tag for hostAppointments
+        tag: "Received",
       }));
     },
   },

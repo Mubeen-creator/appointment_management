@@ -91,7 +91,7 @@ export default function Profile() {
               <span className="text-sm">Branding</span>
             </Link>
             <Link
-              href="/my-link"
+              href="/links"
               className="flex items-center py-2 px-3 text-gray-700 hover:bg-gray-50 rounded-md"
             >
               <FiLink size={16} className="mr-3" />

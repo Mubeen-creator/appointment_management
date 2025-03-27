@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import React, { useState, useEffect, useRef } from "react";
 import { GrLink } from "react-icons/gr";
 import { MdKeyboardArrowDown } from "react-icons/md";
@@ -7,6 +8,7 @@ import { MdKeyboardArrowDown } from "react-icons/md";
 function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -46,14 +48,23 @@ function Header() {
         {isOpen && (
           <div className="absolute left-0 mt-2 w-40 bg-white shadow-lg rounded-lg p-2 z-10">
             <ul className="text-gray-700">
-              <li className="p-2 hover:bg-gray-100 cursor-pointer rounded">
-                Option 1
+              <li
+                className="p-2 hover:bg-gray-100 cursor-pointer rounded"
+                onClick={() => router.push("/dashboard")}
+              >
+                Dashboard
               </li>
-              <li className="p-2 hover:bg-gray-100 cursor-pointer rounded">
-                Option 2
+              <li
+                className="p-2 hover:bg-gray-100 cursor-pointer rounded"
+                onClick={() => router.push("/profile")}
+              >
+                Profile
               </li>
-              <li className="p-2 hover:bg-gray-100 cursor-pointer rounded">
-                Option 3
+              <li
+                className="p-2 hover:bg-gray-100 cursor-pointer rounded"
+                onClick={() => router.push("/availibilityHours")}
+              >
+                Availability
               </li>
             </ul>
           </div>
@@ -61,7 +72,10 @@ function Header() {
       </div>
 
       {/* Copy Link Button */}
-      <div className="flex items-center justify-center border border-gray-600 rounded-full gap-x-2 py-2 md:py-3 w-[130px] md:w-[150px] cursor-pointer ml-4 md:ml-10 mr-0 md:mr-10 lg:mr-20 xl:mr-40 2xl:mr-[300px]">
+      <div
+        className="flex items-center justify-center border border-gray-600 rounded-full gap-x-2 py-2 md:py-3 w-[130px] md:w-[150px] cursor-pointer ml-4 md:ml-10 mr-0 md:mr-10 lg:mr-20 xl:mr-40 2xl:mr-[300px]"
+        onClick={() => router.push("/links")}
+      >
         <GrLink size={18} className="text-black" />
         <p className="text-sm md:text-base">Copy link</p>
       </div>

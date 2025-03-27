@@ -378,6 +378,19 @@ export default function ScheduledEvents() {
                     <strong>Time Zone:</strong> {selectedAppointment.timeZone}
                   </p>
                 )}
+                {selectedAppointment.meetLink && (
+                  <p>
+                    <strong>Google Meet Link:</strong>{" "}
+                    <a
+                      href={selectedAppointment.meetLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:underline"
+                    >
+                      {selectedAppointment.meetLink}
+                    </a>
+                  </p>
+                )}
 
                 {selectedAppointment.tag === "Received" && (
                   <div className="mt-4 space-x-2">

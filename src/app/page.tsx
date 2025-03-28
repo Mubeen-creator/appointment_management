@@ -4,10 +4,10 @@ import Input from "@/components/input/Input";
 import Button from "@/components/button/Button";
 import Image from "next/image";
 import { useState, useEffect } from "react";
-import { useDispatch } from "react-redux";
 import { setUser, logout } from "../store/slices/userSlice";
 import { useRouter } from "next/navigation";
 import { signIn, signOut, useSession } from "next-auth/react";
+import { useAppDispatch } from "@/store/store";
 
 export default function Home() {
   const [email, setEmail] = useState("");
@@ -16,7 +16,7 @@ export default function Home() {
   const [password, setPassword] = useState("");
   const [isSignUp, setIsSignUp] = useState(true);
   const router = useRouter();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const { data: session, status } = useSession();
 
   useEffect(() => {

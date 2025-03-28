@@ -1,8 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { RootState } from "@/store/store";
+import { RootState, useAppDispatch, useAppSelector } from "@/store/store";
 import { setAvailability } from "@/store/slices/availabilitySlice";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
@@ -14,11 +13,11 @@ import "react-toastify/dist/ReactToastify.css";
 
 const EditAvailabilityPage = () => {
   const { data: session, status } = useSession();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const router = useRouter();
 
-  const availability = useSelector((state: RootState) => state.availability);
-  const user = useSelector((state: RootState) => state.user);
+  const availability = useAppSelector((state: RootState) => state.availability);
+  const user = useAppSelector((state: RootState) => state.user);
 
   const [startTime, setStartTime] = useState(availability.startTime || "");
   const [endTime, setEndTime] = useState(availability.endTime || "");

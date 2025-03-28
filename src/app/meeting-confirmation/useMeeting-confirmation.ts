@@ -1,10 +1,9 @@
 "use client";
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
-import { RootState } from "@/store/store";
+import { RootState, useAppSelector } from "@/store/store";
 import { useRouter } from "next/navigation";
 const useConfirmation = () => {
-  const appointment = useSelector((state: RootState) => state.appointment);
+  const appointment = useAppSelector((state: RootState) => state.appointment);
   const router = useRouter();
   const [countdown, setCountdown] = useState(3); // Countdown timer (in seconds)
 

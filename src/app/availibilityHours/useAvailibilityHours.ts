@@ -1,24 +1,17 @@
 "use client";
-
-import AvailableDays from "@/components/availableDays/AvailableDays";
-import Button from "@/components/button/Button";
-import Dropdown from "@/components/dropdown/Dropdown";
-import Image from "next/image";
-import React, { useState, useRef, useEffect } from "react";
-import { GrAnnounce } from "react-icons/gr";
-import { useDispatch, useSelector } from "react-redux";
+import { useState, useRef, useEffect } from "react";
 import { setAvailability } from "@/store/slices/availabilitySlice";
 import { setUser } from "@/store/slices/userSlice"; // Import setUser
 import { useRouter } from "next/navigation";
-import { RootState } from "@/store/store";
+import { RootState, useAppDispatch, useAppSelector } from "@/store/store";
 import { useSession } from "next-auth/react";
 const useAvailibilityHours = () => {
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
   const [selectedDays, setSelectedDays] = useState<string[]>([]);
 
-  const user = useSelector((state: RootState) => state.user);
-  const dispatch = useDispatch();
+  const user = useAppSelector((state: RootState) => state.user);
+  const dispatch = useAppDispatch();
   const router = useRouter();
   const containerRef = useRef<HTMLDivElement>(null);
   const { data: session, status } = useSession(); // Get session from NextAuth

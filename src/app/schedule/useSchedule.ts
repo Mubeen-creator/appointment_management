@@ -1,10 +1,9 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { useDispatch, useSelector } from "react-redux";
 import { setAppointment } from "@/store/slices/appointmentSlice";
 import { useRouter } from "next/navigation";
-import { RootState } from "@/store/store";
+import { RootState, useAppDispatch, useAppSelector } from "@/store/store";
 const useSchedule = () => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
@@ -13,9 +12,9 @@ const useSchedule = () => {
     value: "Asia/Karachi",
   });
 
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const router = useRouter();
-  const user = useSelector((state: RootState) => state.user);
+  const user = useAppSelector((state: RootState) => state.user);
 
   const timeSlots = [
     "9:00am",

@@ -1,8 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { RootState } from "@/store/store";
+import { RootState, useAppDispatch, useAppSelector } from "@/store/store";
 import {
   setAppointmentsHistory,
   setHostAppointments,
@@ -12,6 +11,7 @@ import { useRouter } from "next/navigation";
 import { saveAs } from "file-saver";
 import { parse, format } from "date-fns";
 import { Appointment } from "@/store/slices/appointmentSlice";
+import { FiGrid, FiPieChart, FiClock, FiSettings } from "react-icons/fi";
 
 const useDashboard = () => {
   const [activeTab, setActiveTab] = useState("Upcoming");
@@ -24,12 +24,12 @@ const useDashboard = () => {
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
 
-  const dispatch = useDispatch();
-  const user = useSelector((state: RootState) => state.user);
-  const appointmentsHistory = useSelector(
+  const dispatch = useAppDispatch();
+  const user = useAppSelector((state: RootState) => state.user);
+  const appointmentsHistory = useAppSelector(
     (state: RootState) => state.appointment.appointmentsHistory
   );
-  const hostAppointments = useSelector(
+  const hostAppointments = useAppSelector(
     (state: RootState) => state.appointment.hostAppointments
   );
   const router = useRouter();
@@ -38,6 +38,16 @@ const useDashboard = () => {
   const handleNavigation = () => {
     router.push(profileRoute);
   };
+
+  const sidebarOptions = [
+    { name: "Scheduled events", icon: FiGrid },
+    { name: "Analytics", icon: FiPieChart },
+  ];
+
+  const bottomOptions = [
+    { name: "Availability", icon: FiClock, route: "/editAvailability" },
+    { name: "Admin center", icon: FiSettings, action: "handleNavigation" },
+  ];
 
   useEffect(() => {
     const fetchAppointments = async () => {
@@ -295,6 +305,8 @@ const useDashboard = () => {
     filteredAppointments,
     exportToICS,
     datePickerStyles,
+    sidebarOptions,
+    bottomOptions,
   };
 };
 

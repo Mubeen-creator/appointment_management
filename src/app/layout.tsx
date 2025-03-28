@@ -1,12 +1,11 @@
 "use client";
 
 import { Provider } from "react-redux";
-import { store } from "../store/store";
+import { store, useAppDispatch } from "../store/store";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { SessionProvider, useSession } from "next-auth/react";
 import { useEffect } from "react";
-import { useDispatch } from "react-redux";
 import { setUser } from "../store/slices/userSlice";
 import { ToastContainer } from "react-toastify";
 
@@ -23,7 +22,7 @@ const geistMono = Geist_Mono({
 // Component to sync session with Redux
 function SessionSync() {
   const { data: session, status } = useSession();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     if (status === "authenticated" && session?.user) {

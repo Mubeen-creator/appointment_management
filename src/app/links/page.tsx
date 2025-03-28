@@ -1,8 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
-import { RootState } from "@/store/store";
+import { RootState, useAppSelector } from "@/store/store";
 import { Appointment } from "@/store/slices/appointmentSlice";
 import {
   Copy,
@@ -22,10 +21,10 @@ const LinksPage = () => {
     {}
   );
 
-  const appointmentsHistory = useSelector(
+  const appointmentsHistory = useAppSelector(
     (state: RootState) => state.appointment.appointmentsHistory
   );
-  const hostAppointments = useSelector(
+  const hostAppointments = useAppSelector(
     (state: RootState) => state.appointment.hostAppointments
   );
 

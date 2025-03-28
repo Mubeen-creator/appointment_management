@@ -39,7 +39,7 @@ export default function MeetingScheduler() {
         <div className="bg-white rounded-lg shadow-lg max-w-4xl w-full flex flex-col md:flex-row p-4 md:p-6">
           {/* Left Section: User Info */}
           <div className="w-full md:w-1/3 flex flex-col md:pr-6 mb-4 md:mb-0">
-            <h1 className="font-medium text-gray-600">Muhammad Talha</h1>
+            <h1 className="font-semibold text-gray-500">{user.userName}</h1>
             <span className="text-black font-bold text-xl md:text-2xl">
               30 Minute Meeting
             </span>

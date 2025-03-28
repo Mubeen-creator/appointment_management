@@ -2,8 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useSelector, useDispatch } from "react-redux";
-import { RootState } from "@/store/store";
+import { RootState, useAppDispatch, useAppSelector } from "@/store/store";
 import { addAppointmentToHistory } from "@/store/slices/appointmentSlice";
 import axios from "axios";
 const useConfirm = () => {
@@ -11,13 +10,13 @@ const useConfirm = () => {
   const [email, setEmail] = useState("");
   const [notes, setNotes] = useState("");
 
-  const user = useSelector((state: RootState) => state.user);
+  const user = useAppSelector((state: RootState) => state.user);
 
   const router = useRouter();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   // Get the current appointment details from Redux
-  const { date, time } = useSelector(
+  const { date, time } = useAppSelector(
     (state: RootState) => state.appointment.currentAppointment
   );
 

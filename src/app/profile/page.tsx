@@ -1,12 +1,6 @@
-// Updated profile route page
 "use client";
 import {
   FiUser,
-  FiPenTool,
-  FiLink,
-  FiLock,
-  FiSettings,
-  FiCalendar,
   FiHelpCircle,
   FiLogOut,
   FiChevronLeft,
@@ -14,12 +8,11 @@ import {
 } from "react-icons/fi";
 import Link from "next/link";
 import useProfile from "./useProfile";
+import { FiChevronDown } from "react-icons/fi";
 
 export default function Profile() {
   const {
     user,
-    dispatch,
-    router,
     name,
     setName,
     welcomeMessage,
@@ -35,35 +28,25 @@ export default function Profile() {
     timeZone,
     setTimeZone,
     loading,
-    setLoading,
     profilePicture,
     setProfilePicture,
-    useEffect,
+    showDeletePopup,
     handleLogout,
     handleSaveChanges,
     handlePictureUpload,
     handleDeleteAccount,
+    confirmDeleteAccount,
+    cancelDeleteAccount,
+    links,
   } = useProfile();
 
   return (
-    <div className="flex flex-col md:flex-row min-h-screen bg-white">
-      {/* Header - Mobile Only */}
-      <div className="md:hidden flex items-center justify-between p-4 border-b border-gray-200">
-        <div className="flex items-center">
-          <img src="/logo.png" alt="Calendly" className="h-10" />
-        </div>
-        <button className="text-blue-600 bg-blue-50 rounded-md px-3 py-1 text-sm font-medium">
-          Invite user
-        </button>
-      </div>
-
-      {/* Left Sidebar - Now Fixed */}
+    <div className="flex flex-col md:flex-row min-h-screen bg-gray-5">
+      {/* Sidebar (unchanged) */}
       <div className="w-full md:w-64 md:fixed md:h-screen border-r border-gray-200 bg-white z-10">
-        {/* Logo - Desktop Only */}
         <div className="hidden md:flex items-center p-4 border-b border-gray-200">
           <img src="/logo.png" alt="Calendly" className="h-10" />
         </div>
-
         <div className="p-4">
           <Link
             href="/dashboard"
@@ -72,55 +55,24 @@ export default function Profile() {
             <FiChevronLeft size={16} className="mr-2" />
             <span className="text-sm">Back to home</span>
           </Link>
-
           <h2 className="text-lg font-medium mb-4">Account settings</h2>
-
           <nav className="space-y-1">
-            <Link
-              href="/profile"
-              className="flex items-center py-2 px-3 bg-gray-100 rounded-md text-blue-600"
-            >
-              <FiUser size={16} className="mr-3" />
-              <span className="text-sm">Profile</span>
-            </Link>
-            <Link
-              href=""
-              className="flex items-center py-2 px-3 text-gray-700 hover:bg-gray-50 rounded-md"
-            >
-              <FiPenTool size={16} className="mr-3" />
-              <span className="text-sm">Branding</span>
-            </Link>
-            <Link
-              href="/links"
-              className="flex items-center py-2 px-3 text-gray-700 hover:bg-gray-50 rounded-md"
-            >
-              <FiLink size={16} className="mr-3" />
-              <span className="text-sm">My Link</span>
-            </Link>
-            <Link
-              href=""
-              className="flex items-center py-2 px-3 text-gray-700 hover:bg-gray-50 rounded-md"
-            >
-              <FiLock size={16} className="mr-3" />
-              <span className="text-sm">Login preferences</span>
-            </Link>
-            <Link
-              href=""
-              className="flex items-center py-2 px-3 text-gray-700 hover:bg-gray-50 rounded-md"
-            >
-              <FiSettings size={16} className="mr-3" />
-              <span className="text-sm">Cookie settings</span>
-            </Link>
-            <Link
-              href=""
-              className="flex items-center py-2 px-3 text-gray-700 hover:bg-gray-50 rounded-md"
-            >
-              <FiCalendar size={16} className="mr-3" />
-              <span className="text-sm">Calendar sync</span>
-            </Link>
+            {links.map(({ href, icon: Icon, label, active }) => (
+              <Link
+                key={label}
+                href={href}
+                className={`flex items-center py-2 px-3 rounded-md ${
+                  active
+                    ? "bg-blue-50 font-semibold text-blue-600"
+                    : "text-gray-700 hover:bg-blue-50 font-semibold"
+                }`}
+              >
+                <Icon size={16} className="mr-3" />
+                <span className="text-sm">{label}</span>
+              </Link>
+            ))}
           </nav>
         </div>
-
         <div className="border-t border-gray-200 p-4 absolute bottom-0 w-full">
           <div className="flex items-center py-2 px-3 text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer">
             <FiHelpCircle size={16} className="mr-3" />
@@ -136,15 +88,15 @@ export default function Profile() {
         </div>
       </div>
 
-      {/* Main Content - With Left Margin to Account for Fixed Sidebar */}
-      <div className="flex-1 md:ml-64 overflow-auto p-4 md:p-8 bg-gray-50">
+      {/* Main Content */}
+      <div className="md:ml-64 overflow-auto p-4 md:p-8 md:pt-20 bg-gray-50 flex-1">
         <div className="max-w-3xl">
           <div className="flex flex-col mb-6">
-            <span className="text-sm text-gray-500">Account details</span>
+            <span className="text-md text-gray-600">Account details</span>
             <h1 className="text-2xl font-medium">Profile</h1>
           </div>
 
-          <div className="bg-white rounded-md shadow-sm p-6 mb-6">
+          <div className="p-6">
             {/* Profile Picture */}
             <div className="flex flex-col md:flex-row items-center md:items-start mb-8">
               <div className="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center mb-4 md:mb-0 md:mr-6">
@@ -168,7 +120,7 @@ export default function Profile() {
                 />
                 <label
                   htmlFor="profilePictureInput"
-                  className="px-4 py-1 border border-gray-300 rounded-md text-sm cursor-pointer"
+                  className="px-4 py-2 border border-gray-300 rounded-full text-sm cursor-pointer"
                 >
                   Upload picture
                 </label>
@@ -177,6 +129,7 @@ export default function Profile() {
                 </p>
               </div>
             </div>
+
             {/* Name */}
             <div className="mb-6">
               <div className="flex items-center mb-1">
@@ -193,9 +146,10 @@ export default function Profile() {
                 id="name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full md:w-80 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full md:w-100 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
             </div>
+
             {/* Welcome Message */}
             <div className="mb-6">
               <div className="flex items-center mb-1">
@@ -212,10 +166,11 @@ export default function Profile() {
                 value={welcomeMessage}
                 onChange={(e) => setWelcomeMessage(e.target.value)}
                 rows={4}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full md:w-100 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
             </div>
-            ... {/* Language */}
+
+            {/* Language */}
             <div className="mb-6">
               <label
                 htmlFor="language"
@@ -223,7 +178,7 @@ export default function Profile() {
               >
                 Language
               </label>
-              <div className="relative w-full md:w-80">
+              <div className="relative w-full md:w-100">
                 <select
                   id="language"
                   value={language}
@@ -235,23 +190,14 @@ export default function Profile() {
                   <option>German</option>
                   <option>Spanish</option>
                 </select>
-                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                  <svg
-                    className="w-4 h-4"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-blue-500">
+                  <FiChevronDown size={18} />
                 </div>
               </div>
             </div>
+
             {/* Date and Time Format */}
-            <div className="flex flex-col md:flex-row mb-6">
+            <div className="flex flex-col md:flex-row mb-6 w-full md:w-100">
               <div className="w-full md:w-1/2 md:pr-2 mb-4 md:mb-0">
                 <div className="flex items-center mb-1">
                   <label
@@ -273,18 +219,8 @@ export default function Profile() {
                     <option>MM/DD/YYYY</option>
                     <option>YYYY/MM/DD</option>
                   </select>
-                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                    <svg
-                      className="w-4 h-4"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
+                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-blue-500">
+                    <FiChevronDown size={18} />
                   </div>
                 </div>
               </div>
@@ -308,23 +244,14 @@ export default function Profile() {
                     <option>12h (am/pm)</option>
                     <option>24h</option>
                   </select>
-                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                    <svg
-                      className="w-4 h-4"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
+                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-blue-500">
+                    <FiChevronDown size={18} />
                   </div>
                 </div>
               </div>
             </div>
-            ... {/* Country */}
+
+            {/* Country */}
             <div className="mb-6">
               <label
                 htmlFor="country"
@@ -332,7 +259,7 @@ export default function Profile() {
               >
                 Country
               </label>
-              <div className="relative w-full md:w-80">
+              <div className="relative w-full md:w-100">
                 <select
                   id="country"
                   value={country}
@@ -344,23 +271,14 @@ export default function Profile() {
                   <option>United Kingdom</option>
                   <option>Canada</option>
                 </select>
-                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                  <svg
-                    className="w-4 h-4"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-blue-500">
+                  <FiChevronDown size={18} />
                 </div>
               </div>
             </div>
+
             {/* Time Zone */}
-            <div className="mb-6">
+            <div className="mb-6 w-full md:w-100">
               <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-1">
                 <label
                   htmlFor="timeZone"
@@ -384,43 +302,60 @@ export default function Profile() {
                   <option>EST, Eastern Standard Time</option>
                   <option>PST, Pacific Standard Time</option>
                 </select>
-                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                  <svg
-                    className="w-4 h-4"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-blue-500">
+                  <FiChevronDown size={18} />
                 </div>
               </div>
             </div>
-            <button
-              onClick={handleSaveChanges}
-              className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
-            >
-              Save changes
-            </button>
+
+            {/* Buttons */}
+            <div className="flex items-center gap-3">
+              <button
+                onClick={handleSaveChanges}
+                className="bg-blue-600 text-white px-4 py-2 rounded-full hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+              >
+                Save Changes
+              </button>
+              <button className="border border-gray-300 text-gray-700 px-4 py-2 rounded-full hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50">
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteAccount}
+                className="bg-red-700 cursor-pointer text-white px-4 py-2 rounded-full hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 md:ml-[180px] ml-10"
+              >
+                Delete Account
+              </button>
+            </div>
           </div>
 
-          {/* Delete Account */}
-          <div className="bg-white rounded-md shadow-sm p-6">
-            <h2 className="text-lg font-medium mb-4">Delete Account</h2>
-            <p className="text-gray-600 mb-4">
-              Permanently delete your account and all associated data. This
-              action cannot be undone.
-            </p>
-            <button
-              onClick={handleDeleteAccount}
-              className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50"
-            >
-              Delete Account
-            </button>
-          </div>
+          {/* Delete Confirmation Popup */}
+          {showDeletePopup && (
+            <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+              <div className="bg-white p-6 rounded-md shadow-lg max-w-sm w-full">
+                <h2 className="text-lg font-medium mb-4">
+                  Confirm Account Deletion
+                </h2>
+                <p className="text-gray-600 mb-6">
+                  Are you sure you want to delete your account? This action
+                  cannot be undone.
+                </p>
+                <div className="flex justify-end gap-3">
+                  <button
+                    onClick={cancelDeleteAccount}
+                    className="border border-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-100 focus:outline-none"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={confirmDeleteAccount}
+                    className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 focus:outline-none"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

@@ -24,6 +24,7 @@ import {
 } from "react-icons/fi";
 import DatePicker from "react-datepicker";
 import useDashboard from "./useDashboard";
+import { FiChevronDown } from "react-icons/fi";
 
 // Register Chart.js components
 ChartJS.register(
@@ -68,6 +69,8 @@ export default function ScheduledEvents() {
     filteredAppointments,
     exportToICS,
     datePickerStyles,
+    sidebarOptions,
+    bottomOptions,
   } = useDashboard();
 
   return (
@@ -95,70 +98,63 @@ export default function ScheduledEvents() {
             <FiChevronLeft size={20} />
           </button>
         </div>
+
+        {/* Create Button */}
         <div className="p-4" onClick={() => router.push("schedule")}>
-          <button className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-md py-2 px-4 flex items-center justify-center cursor-pointer">
+          <button className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-full py-2 px-4 flex items-center justify-center cursor-pointer">
             <FiPlus size={16} className="mr-2" /> Create
           </button>
         </div>
+
+        {/* Sidebar Options */}
         <div className="mt-4 px-2">
-          <div
-            className={`flex items-center px-4 py-3 rounded-md cursor-pointer ${
-              activeSidebarOption === "Scheduled events"
-                ? "bg-blue-50 border-l-4 border-blue-600 text-blue-600"
-                : "text-gray-600 hover:bg-gray-100"
-            }`}
-            onClick={() => setActiveSidebarOption("Scheduled events")}
-          >
-            <FiGrid size={18} className="mr-3" />
-            <span className="text-sm font-medium">Scheduled events</span>
-          </div>
-          <div
-            className={`flex items-center px-4 py-3 rounded-md cursor-pointer mt-1 ${
-              activeSidebarOption === "Analytics"
-                ? "bg-blue-50 border-l-4 border-blue-600 text-blue-600"
-                : "text-gray-600 hover:bg-gray-100"
-            }`}
-            onClick={() => setActiveSidebarOption("Analytics")}
-          >
-            <FiPieChart size={18} className="mr-3" />
-            <span className="text-sm font-medium">Analytics</span>
-          </div>
+          {sidebarOptions.map(({ name, icon: Icon }) => (
+            <div
+              key={name}
+              className={`flex items-center px-4 py-3 rounded-md cursor-pointer ${
+                activeSidebarOption === name
+                  ? "bg-blue-50 font-semibold text-blue-600"
+                  : "text-gray-600 font-semibold hover:bg-gray-100"
+              }`}
+              onClick={() => setActiveSidebarOption(name)}
+            >
+              <Icon size={18} className="mr-3" />
+              <span className="text-sm font-medium">{name}</span>
+            </div>
+          ))}
         </div>
+
+        {/* Bottom Options */}
         <div className="mt-auto px-2 mb-4">
-          <div
-            className="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-md cursor-pointer"
-            onClick={() => router.push("/editAvailability")}
-          >
-            <FiClock size={18} className="mr-3" />
-            <span className="text-sm font-medium">Availability</span>
-          </div>
-          <div
-            className="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-md mt-1 cursor-pointer"
-            onClick={handleNavigation}
-          >
-            <FiSettings size={18} className="mr-3" />
-            <span className="text-sm font-medium">Admin center</span>
-          </div>
+          {bottomOptions.map(({ name, icon: Icon, route, action }) => (
+            <div
+              key={name}
+              className="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-md cursor-pointer mt-1"
+              onClick={() =>
+                route
+                  ? router.push(route)
+                  : action === "handleNavigation" && handleNavigation()
+              }
+            >
+              <Icon size={18} className="mr-3" />
+              <span className="text-sm font-medium">{name}</span>
+            </div>
+          ))}
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 bg-gray-50 overflow-auto">
+      <div className="flex-1 bg-gray-50 overflow-auto md:pt-20 p-8">
         <div className="p-4 md:p-6">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center">
               <button
                 onClick={() => setSidebarOpen(true)}
-                className="mr-3 text-gray-500 hover:text-gray-700"
+                className="mr-3 md:hidden text-gray-500 hover:text-gray-700"
               >
                 <FiChevronRight size={20} />
               </button>
-              <h1 className="text-xl font-semibold">Scheduled events</h1>
-            </div>
-            <div className="flex items-center">
-              <button className="bg-white shadow-sm rounded-md p-1">
-                <FiMoreVertical size={20} className="text-gray-600" />
-              </button>
+              <h1 className="text-2xl font-bold">Scheduled events</h1>
             </div>
           </div>
 
@@ -170,10 +166,11 @@ export default function ScheduledEvents() {
 
           {activeSidebarOption === "Scheduled events" && (
             <>
-              <div className="bg-white rounded-md shadow-sm p-4 mb-4">
+              <div className="p-4 mb-4">
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center space-y-2 md:space-y-0">
-                  <div className="text-sm font-medium text-gray-700">
+                  <div className="text-sm font-medium text-gray-700 bg-white px-4 py-2 border border-gray-300 rounded-md flex items-center justify-between">
                     My Calendly's
+                    <FiChevronDown size={16} className="ml-2" />
                   </div>
                   <div className="text-sm text-gray-500">
                     Displaying {filteredAppointments.length} of{" "}
@@ -229,12 +226,12 @@ export default function ScheduledEvents() {
                   <div className="flex items-center mt-4 md:mt-0 w-full md:w-auto justify-end">
                     <button
                       onClick={exportToICS}
-                      className="mr-2 px-4 py-1 text-sm border border-gray-300 rounded-md flex items-center hover:bg-gray-50"
+                      className="mr-2 px-4 py-1 text-sm border border-gray-800 rounded-full flex items-center hover:bg-gray-50"
                     >
                       <FiDownload size={16} className="mr-2" />
                       Export
                     </button>
-                    <button className="px-4 py-1 text-sm border border-gray-300 rounded-md flex items-center hover:bg-gray-50">
+                    <button className="px-4 py-1 text-sm border border-gray-800 rounded-full flex items-center hover:bg-gray-50">
                       <FiFilter size={16} className="mr-2" />
                       Filter
                     </button>

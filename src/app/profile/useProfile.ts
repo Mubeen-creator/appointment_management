@@ -1,16 +1,23 @@
 "use client";
 import { useState, useEffect } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { RootState } from "@/store/store";
+import { RootState, useAppDispatch, useAppSelector } from "@/store/store";
 import { logout, setUser } from "@/store/slices/userSlice";
 import { useRouter } from "next/navigation";
+import {
+  FiUser,
+  FiPenTool,
+  FiLink,
+  FiLock,
+  FiSettings,
+  FiCalendar,
+} from "react-icons/fi";
 
 const useProfile = () => {
-  const user = useSelector((state: RootState) => state.user);
-  const dispatch = useDispatch();
+  const user = useAppSelector((state: RootState) => state.user);
+  const dispatch = useAppDispatch();
   const router = useRouter();
 
-  // Form state, initializing from Redux user state
+  // Form state
   const [name, setName] = useState("");
   const [welcomeMessage, setWelcomeMessage] = useState("");
   const [language, setLanguage] = useState("English");
@@ -18,41 +25,33 @@ const useProfile = () => {
   const [timeFormat, setTimeFormat] = useState("12h (am/pm)");
   const [country, setCountry] = useState("Pakistan");
   const [timeZone, setTimeZone] = useState("Pakistan, Mulkisan Time");
-  // const [profilePicture, setProfilePicture] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [profilePicture, setProfilePicture] = useState(
     user.profilePicture || null
   );
+  const [loading, setLoading] = useState(true);
+  // State for delete confirmation popup
+  const [showDeletePopup, setShowDeletePopup] = useState(false);
 
-  // Initialize name with userName on initial load
+  // Initialize form state from Redux
   useEffect(() => {
-    if (user.userName) {
-      setName(user.userName); // Set initial name to userName
-    }
-    if (user.welcomeMessage) {
-      setWelcomeMessage(user.welcomeMessage);
-    }
-    if (user.profilePicture) {
-      setProfilePicture(user.profilePicture);
-    }
+    if (user.userName) setName(user.userName);
+    if (user.welcomeMessage) setWelcomeMessage(user.welcomeMessage);
+    if (user.profilePicture) setProfilePicture(user.profilePicture);
   }, [user.userName, user.welcomeMessage, user.profilePicture]);
 
   const handleLogout = () => {
     dispatch(logout());
-    router.push("/"); // Redirect to the home or login page after logout
+    router.push("/");
   };
 
-  // Fetch user data on component mount
+  // Fetch user data
   useEffect(() => {
     const fetchUserData = async () => {
       if (!user.email) return;
-
       try {
         const response = await fetch(`/api/get-user?email=${user.email}`);
         if (response.ok) {
           const userData = await response.json();
-
-          // Update form state with fetched data
           setName(userData.fullName || "");
           setWelcomeMessage(userData.welcomeMessage || "");
           setLanguage(userData.language || "English");
@@ -61,8 +60,6 @@ const useProfile = () => {
           setCountry(userData.country || "Pakistan");
           setTimeZone(userData.timeZone || "Pakistan, Mulkisan Time");
           setProfilePicture(userData.profilePicture || null);
-
-          // Update Redux store
           dispatch(
             setUser({
               ...user,
@@ -78,17 +75,14 @@ const useProfile = () => {
         setLoading(false);
       }
     };
-
     fetchUserData();
   }, [user.email, dispatch]);
 
   const handleSaveChanges = async () => {
     try {
       const response = await fetch("/api/update-profile", {
-        method: "PUT", // Changed from POST to PUT
-        headers: {
-          "Content-Type": "application/json",
-        },
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email: user.email,
           fullName: name,
@@ -101,16 +95,14 @@ const useProfile = () => {
           profilePicture,
         }),
       });
-
       if (response.ok) {
         alert("Profile updated successfully!");
-        // Update Redux store
         dispatch(
           setUser({
             ...user,
             fullName: name,
-            welcomeMessage: welcomeMessage,
-            profilePicture: profilePicture,
+            welcomeMessage,
+            profilePicture,
           })
         );
       } else {
@@ -125,20 +117,17 @@ const useProfile = () => {
   const handlePictureUpload = async (event: any) => {
     const file = event.target.files[0];
     if (!file) return;
-
     const formData = new FormData();
     formData.append("profilePicture", file);
-    formData.append("email", user.email); // Assuming email is used to identify the user
-
+    formData.append("email", user.email);
     try {
       const response = await fetch("/api/upload-profile-picture", {
         method: "POST",
         body: formData,
       });
-
       if (response.ok) {
         const result = await response.json();
-        setProfilePicture(result.imageUrl); // Update state with the new image URL
+        setProfilePicture(result.imageUrl);
         alert("Profile picture updated successfully!");
       } else {
         alert("Failed to upload profile picture.");
@@ -150,14 +139,46 @@ const useProfile = () => {
   };
 
   const handleDeleteAccount = () => {
-    // Handle delete account logic here
-    console.log("Delete account requested");
+    setShowDeletePopup(true); // Show confirmation popup
   };
+
+  const confirmDeleteAccount = async () => {
+    try {
+      const response = await fetch("/api/delete-account", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: user.email }),
+      });
+      if (response.ok) {
+        alert("Account deleted successfully!");
+        dispatch(logout());
+        router.push("/");
+      } else {
+        alert("Failed to delete account.");
+      }
+    } catch (error) {
+      console.error("Error deleting account:", error);
+      alert("An error occurred while deleting the account.");
+    } finally {
+      setShowDeletePopup(false);
+    }
+  };
+
+  const cancelDeleteAccount = () => {
+    setShowDeletePopup(false); // Hide popup
+  };
+
+  const links = [
+    { href: "/profile", icon: FiUser, label: "Profile", active: true },
+    { href: "", icon: FiPenTool, label: "Branding" },
+    { href: "/links", icon: FiLink, label: "My Link" },
+    { href: "", icon: FiLock, label: "Login preferences" },
+    { href: "", icon: FiSettings, label: "Cookie settings" },
+    { href: "", icon: FiCalendar, label: "Calendar sync" },
+  ];
 
   return {
     user,
-    dispatch,
-    router,
     name,
     setName,
     welcomeMessage,
@@ -173,14 +194,16 @@ const useProfile = () => {
     timeZone,
     setTimeZone,
     loading,
-    setLoading,
     profilePicture,
     setProfilePicture,
-    useEffect,
+    showDeletePopup,
     handleLogout,
     handleSaveChanges,
     handlePictureUpload,
     handleDeleteAccount,
+    confirmDeleteAccount,
+    cancelDeleteAccount,
+    links,
   };
 };
 

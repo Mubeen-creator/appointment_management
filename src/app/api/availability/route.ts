@@ -13,10 +13,10 @@ export async function POST(request: Request) {
     });
 
     const missingFields = [];
-    if (!email) missingFields.push("email");
-    if (!startTime) missingFields.push("startTime");
-    if (!endTime) missingFields.push("endTime");
-    if (!availableDays?.length) missingFields.push("availableDays");
+    if (!email) missingFields?.push("email");
+    if (!startTime) missingFields?.push("startTime");
+    if (!endTime) missingFields?.push("endTime");
+    if (!availableDays?.length) missingFields?.push("availableDays");
 
     if (missingFields.length > 0) {
       return NextResponse.json(
@@ -29,9 +29,9 @@ export async function POST(request: Request) {
     }
 
     const client = await clientPromise;
-    const db = client.db("appointmentManagement");
+    const db = client?.db("appointmentManagement");
 
-    const result = await db.collection("users").updateOne(
+    const result = await db?.collection("users").updateOne(
       { email },
       {
         $set: {

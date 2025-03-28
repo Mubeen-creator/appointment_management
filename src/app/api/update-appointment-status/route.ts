@@ -40,7 +40,7 @@ export async function POST(request: Request) {
     }
 
     const client = await clientPromise;
-    const db = client.db("appointmentManagement");
+    const db = client?.db("appointmentManagement");
 
     let objectId;
     try {
@@ -69,7 +69,7 @@ export async function POST(request: Request) {
       status,
       updatedAt: new Date(),
     };
-    let meetLink = existingDoc.meetLink;
+    let meetLink = existingDoc?.meetLink;
     if (status === "accepted" && !meetLink) {
       meetLink = generateGoogleMeetLink();
       updateData.meetLink = meetLink;
@@ -99,8 +99,8 @@ export async function POST(request: Request) {
       const transporter = nodemailer.createTransport({
         service: "gmail",
         auth: {
-          user: process.env.EMAIL_USER,
-          pass: process.env.EMAIL_PASS,
+          user: process.env?.EMAIL_USER,
+          pass: process.env?.EMAIL_PASS,
         },
       });
 
@@ -110,10 +110,10 @@ export async function POST(request: Request) {
 
         Your appointment request has been ${status}.
 
-        Date: ${updatedDoc.date}
-        Time: ${updatedDoc.time}
-        Host: ${updatedDoc.hostEmail}
-        Message: ${updatedDoc.message || "No message provided"}
+        Date: ${updatedDoc?.date}
+        Time: ${updatedDoc?.time}
+        Host: ${updatedDoc?.hostEmail}
+        Message: ${updatedDoc?.message || "No message provided"}
         ${
           status === "accepted" && meetLink
             ? `Google Meet Link: ${meetLink}`
@@ -122,7 +122,7 @@ export async function POST(request: Request) {
       `;
 
       const mailOptions = {
-        from: process.env.EMAIL_USER,
+        from: process.env?.EMAIL_USER,
         to: requesterEmail,
         subject,
         text: emailContent,
@@ -132,26 +132,26 @@ export async function POST(request: Request) {
       if (status === "accepted" && meetLink) {
         const hostMailOptions = {
           ...mailOptions,
-          to: updatedDoc.hostEmail,
+          to: updatedDoc?.hostEmail,
           text: `
             Hi,
 
             You have accepted an appointment.
 
-            Date: ${updatedDoc.date}
-            Time: ${updatedDoc.time}
-            Requester: ${updatedDoc.requesterEmail}
-            Message: ${updatedDoc.message || "No message provided"}
+            Date: ${updatedDoc?.date}
+            Time: ${updatedDoc?.time}
+            Requester: ${updatedDoc?.requesterEmail}
+            Message: ${updatedDoc?.message || "No message provided"}
             Google Meet Link: ${meetLink}
           `,
         };
-        await transporter.sendMail(hostMailOptions);
+        await transporter?.sendMail(hostMailOptions);
       }
 
       console.log("[API] Sending email notification to:", requesterEmail);
       try {
         const info = await transporter.sendMail(mailOptions);
-        console.log("[API] Email sent successfully:", info.response);
+        console.log("[API] Email sent successfully:", info?.response);
       } catch (emailError) {
         console.error("[API] Email sending failed:", emailError);
       }

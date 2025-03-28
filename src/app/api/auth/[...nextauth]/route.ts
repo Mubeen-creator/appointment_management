@@ -18,9 +18,9 @@ export const authOptions: AuthOptions = {
         }
 
         const client = await clientPromise;
-        const db = client.db("appointmentManagement");
+        const db = client?.db("appointmentManagement");
 
-        const user = await db.collection("users").findOne({
+        const user = await db?.collection("users").findOne({
           email: credentials.email,
         });
 
@@ -28,7 +28,7 @@ export const authOptions: AuthOptions = {
           return null;
         }
 
-        const isPasswordValid = await bcrypt.compare(
+        const isPasswordValid = await bcrypt?.compare(
           credentials.password,
           user.password
         );
@@ -38,10 +38,10 @@ export const authOptions: AuthOptions = {
         }
 
         return {
-          id: user._id.toString(),
-          email: user.email,
-          fullName: user.fullName,
-          userName: user.userName,
+          id: user?._id.toString(),
+          email: user?.email,
+          fullName: user?.fullName,
+          userName: user?.userName,
         };
       },
     }),
@@ -53,16 +53,16 @@ export const authOptions: AuthOptions = {
     async jwt({ token, user }: { token: JWT; user?: any }) {
       if (user) {
         token.id = user.id;
-        token.fullName = user.fullName;
-        token.userName = user.userName;
+        token.fullName = user?.fullName;
+        token.userName = user?.userName;
       }
       return token;
     },
     async session({ session, token }: { session: Session; token: JWT }) {
       if (token) {
         session.user.id = token.id;
-        session.user.fullName = token.fullName;
-        session.user.userName = token.userName;
+        session.user.fullName = token?.fullName;
+        session.user.userName = token?.userName;
       }
       return session;
     },

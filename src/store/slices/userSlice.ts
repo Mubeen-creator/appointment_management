@@ -35,13 +35,13 @@ const userSlice = createSlice({
         profilePicture?: string | null;
       }>
     ) => {
-      state.email = action.payload.email;
-      state.fullName = action.payload.fullName;
-      state.userName = action.payload.userName;
-      state.password = action.payload.password;
+      state.email = action?.payload?.email;
+      state.fullName = action?.payload?.fullName;
+      state.userName = action?.payload?.userName;
+      state.password = action?.payload?.password;
       state.isAuthenticated = true;
-      state.welcomeMessage = action.payload.welcomeMessage;
-      state.profilePicture = action.payload.profilePicture || null;
+      state.welcomeMessage = action?.payload?.welcomeMessage;
+      state.profilePicture = action?.payload?.profilePicture || null;
     },
     logout: (state) => {
       state.email = "";

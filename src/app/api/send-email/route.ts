@@ -20,8 +20,8 @@ export async function POST(req: Request) {
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
+        user: process.env?.EMAIL_USER,
+        pass: process.env?.EMAIL_PASS,
       },
     });
 
@@ -30,15 +30,15 @@ export async function POST(req: Request) {
 
   You have a new appointment request from ${appointmentData.requesterEmail}.
 
-  Date: ${appointmentData.date}
-  Time: ${appointmentData.time}
-  Time Zone: ${appointmentData.timeZone}
+  Date: ${appointmentData?.date}
+  Time: ${appointmentData?.time}
+  Time Zone: ${appointmentData?.timeZone}
 
-  Message: ${appointmentData.message}
+  Message: ${appointmentData?.message}
 `;
 
     const mailOptions = {
-      from: process.env.EMAIL_USER,
+      from: process.env?.EMAIL_USER,
       to,
       subject,
       text: emailContent,

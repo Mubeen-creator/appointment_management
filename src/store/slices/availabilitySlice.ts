@@ -24,9 +24,9 @@ const availabilitySlice = createSlice({
         availableDays: string[];
       }>
     ) => {
-      state.startTime = action.payload.startTime;
-      state.endTime = action.payload.endTime;
-      state.availableDays = action.payload.availableDays;
+      state.startTime = action?.payload?.startTime;
+      state.endTime = action?.payload?.endTime;
+      state.availableDays = action?.payload?.availableDays;
     },
   },
 });

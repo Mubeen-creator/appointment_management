@@ -17,7 +17,7 @@ const useConfirm = () => {
 
   // Get the current appointment details from Redux
   const { date, time } = useAppSelector(
-    (state: RootState) => state.appointment.currentAppointment
+    (state: RootState) => state?.appointment?.currentAppointment
   );
 
   const handleConfirm = async () => {
@@ -31,14 +31,14 @@ const useConfirm = () => {
 
       // Step 1: Create the appointment
       const appointmentResponse = await axios.post("/api/appointments", {
-        requesterEmail: user.email, // Requester's email from Redux
+        requesterEmail: user?.email, // Requester's email from Redux
         hostEmail: email, // Host email from user input
         date,
         time,
         message: notes, // Message from user input
       });
 
-      if (appointmentResponse.status !== 201) {
+      if (appointmentResponse?.status !== 201) {
         alert(`Appointment failed: ${appointmentResponse.data.message}`);
         return;
       }
@@ -48,7 +48,7 @@ const useConfirm = () => {
         subject: `New Appointment Request from ${name}`,
         text: `Hi there,\n\n${name} has requested an appointment on ${date} at ${time}.\n\nMessage: ${notes}`,
         appointmentData: {
-          requesterEmail: user.email,
+          requesterEmail: user?.email,
           hostEmail: email,
           date,
           time,
@@ -62,7 +62,7 @@ const useConfirm = () => {
       const emailResponse = await axios.post("/api/send-email", emailPayload);
 
       if (emailResponse.status !== 200) {
-        alert(`Email failed: ${emailResponse.data.message}`);
+        alert(`Email failed: ${emailResponse?.data?.message}`);
         return;
       }
 

@@ -22,22 +22,22 @@ const LinksPage = () => {
   );
 
   const appointmentsHistory = useAppSelector(
-    (state: RootState) => state.appointment.appointmentsHistory
+    (state: RootState) => state?.appointment?.appointmentsHistory
   );
   const hostAppointments = useAppSelector(
-    (state: RootState) => state.appointment.hostAppointments
+    (state: RootState) => state?.appointment?.hostAppointments
   );
 
   useEffect(() => {
     const allAppointments = [...appointmentsHistory, ...hostAppointments];
     const filtered = allAppointments.filter(
-      (appt) => appt.status === "accepted" && appt.meetLink
+      (appt) => appt?.status === "accepted" && appt?.meetLink
     );
     setAcceptedAppointments(filtered);
   }, [appointmentsHistory, hostAppointments]);
 
   const copyToClipboard = (link: string, appointmentId: string) => {
-    navigator.clipboard.writeText(link);
+    navigator?.clipboard?.writeText(link);
 
     setCopiedStates((prev) => ({
       ...prev,
@@ -101,7 +101,7 @@ const LinksPage = () => {
           <div className="w-12"></div>
         </div>
 
-        {acceptedAppointments.length === 0 ? (
+        {acceptedAppointments?.length === 0 ? (
           <div className="bg-white shadow-sm rounded-2xl p-8 text-center border border-gray-200">
             <p className="text-gray-500 text-lg">
               No accepted appointments with links found.
@@ -109,29 +109,29 @@ const LinksPage = () => {
           </div>
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {acceptedAppointments.map((appointment: any) => (
+            {acceptedAppointments?.map((appointment: any) => (
               <div
-                key={appointment._id}
+                key={appointment?._id}
                 className="bg-white rounded-2xl shadow-[0_10px_25px_-10px_rgba(0,0,0,0.1)] border border-gray-200 overflow-hidden transition-all duration-300 hover:shadow-[0_15px_30px_-10px_rgba(0,0,0,0.15)]"
               >
                 <div className="p-6 border-b border-gray-100">
                   <div className="mb-2">
                     <h2 className="text-xl font-semibold text-gray-800 break-words">
                       Meeting with{" "}
-                      {appointment.tag === "Sent"
-                        ? appointment.hostEmail
-                        : appointment.requesterEmail}
+                      {appointment?.tag === "Sent"
+                        ? appointment?.hostEmail
+                        : appointment?.requesterEmail}
                     </h2>
                   </div>
 
                   <div className="flex items-center text-gray-600 space-x-3 mb-4">
                     <div className="flex items-center space-x-2">
                       <Calendar className="w-4 h-4 text-blue-500" />
-                      <span className="text-sm">{appointment.date}</span>
+                      <span className="text-sm">{appointment?.date}</span>
                     </div>
                     <div className="flex items-center space-x-2">
                       <Clock className="w-4 h-4 text-green-500" />
-                      <span className="text-sm">{appointment.time}</span>
+                      <span className="text-sm">{appointment?.time}</span>
                     </div>
                   </div>
                 </div>
@@ -141,19 +141,19 @@ const LinksPage = () => {
                     <div className="flex items-center space-x-2 w-full">
                       <LinkIcon className="w-5 h-5 text-gray-500 flex-shrink-0" />
                       <a
-                        href={appointment.meetLink}
+                        href={appointment?.meetLink}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-blue-600 hover:text-blue-800 text-sm break-words w-full"
                       >
-                        {appointment.meetLink}
+                        {appointment?.meetLink}
                       </a>
                     </div>
                   </div>
 
                   <button
                     onClick={() =>
-                      copyToClipboard(appointment.meetLink!, appointment._id)
+                      copyToClipboard(appointment?.meetLink!, appointment?._id)
                     }
                     className="w-full flex items-center justify-center px-4 py-2.5 
                       bg-gradient-to-r from-blue-500 to-blue-600 
@@ -162,7 +162,7 @@ const LinksPage = () => {
                       transition-all duration-300 
                       focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                   >
-                    {copiedStates[appointment._id] ? (
+                    {copiedStates[appointment?._id] ? (
                       <span className="font-medium">Copied to Clipboard</span>
                     ) : (
                       <>

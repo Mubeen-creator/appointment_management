@@ -33,14 +33,14 @@ export default function ConfirmMeeting() {
             {/* Back Arrow */}
             <button
               className="mb-4 text-blue-500 border p-2 border-gray-300 rounded-full cursor-pointer"
-              onClick={() => router.push("/schedule")}
+              onClick={() => router?.push("/schedule")}
             >
               <ArrowLeftIcon className="h-5 w-5" />
             </button>
 
             {/* Meeting Details */}
             <div>
-              <h1 className="font-medium text-gray-600">{user.userName}</h1>
+              <h1 className="font-medium text-gray-600">{user?.userName}</h1>
               <p className="text-lg md:text-xl font-bold text-black mt-1">
                 30 Minute Meeting
               </p>
@@ -99,7 +99,7 @@ export default function ConfirmMeeting() {
                   type="text"
                   placeholder=""
                   value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  onChange={(e) => setName(e?.target?.value)}
                 />
               </div>
 
@@ -115,7 +115,7 @@ export default function ConfirmMeeting() {
                   type="email"
                   placeholder=""
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => setEmail(e?.target?.value)}
                 />
               </div>
 
@@ -130,7 +130,7 @@ export default function ConfirmMeeting() {
                 <textarea
                   id="notes"
                   value={notes}
-                  onChange={(e) => setNotes(e.target.value)}
+                  onChange={(e) => setNotes(e?.target?.value)}
                   className="border border-gray-400 px-3 py-3 rounded-md w-full md:w-[88%] focus:outline-none focus:ring-2 focus:ring-gray-700 mt-2"
                 />
               </div>

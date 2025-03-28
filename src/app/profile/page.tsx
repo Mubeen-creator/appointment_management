@@ -145,7 +145,7 @@ export default function Profile() {
                 type="text"
                 id="name"
                 value={name}
-                onChange={(e) => setName(e.target.value)}
+                onChange={(e) => setName(e?.target?.value)}
                 className="w-full md:w-100 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
             </div>
@@ -164,7 +164,7 @@ export default function Profile() {
               <textarea
                 id="welcomeMessage"
                 value={welcomeMessage}
-                onChange={(e) => setWelcomeMessage(e.target.value)}
+                onChange={(e) => setWelcomeMessage(e?.target?.value)}
                 rows={4}
                 className="w-full md:w-100 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
@@ -182,7 +182,7 @@ export default function Profile() {
                 <select
                   id="language"
                   value={language}
-                  onChange={(e) => setLanguage(e.target.value)}
+                  onChange={(e) => setLanguage(e?.target?.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md appearance-none focus:outline-none focus:ring-1 focus:ring-blue-500"
                 >
                   <option>English</option>
@@ -212,7 +212,7 @@ export default function Profile() {
                   <select
                     id="dateFormat"
                     value={dateFormat}
-                    onChange={(e) => setDateFormat(e.target.value)}
+                    onChange={(e) => setDateFormat(e?.target?.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md appearance-none focus:outline-none focus:ring-1 focus:ring-blue-500"
                   >
                     <option>DD/MM/YYYY</option>
@@ -238,7 +238,7 @@ export default function Profile() {
                   <select
                     id="timeFormat"
                     value={timeFormat}
-                    onChange={(e) => setTimeFormat(e.target.value)}
+                    onChange={(e) => setTimeFormat(e?.target?.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md appearance-none focus:outline-none focus:ring-1 focus:ring-blue-500"
                   >
                     <option>12h (am/pm)</option>
@@ -263,7 +263,7 @@ export default function Profile() {
                 <select
                   id="country"
                   value={country}
-                  onChange={(e) => setCountry(e.target.value)}
+                  onChange={(e) => setCountry(e?.target?.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md appearance-none focus:outline-none focus:ring-1 focus:ring-blue-500"
                 >
                   <option>Pakistan</option>
@@ -294,7 +294,7 @@ export default function Profile() {
                 <select
                   id="timeZone"
                   value={timeZone}
-                  onChange={(e) => setTimeZone(e.target.value)}
+                  onChange={(e) => setTimeZone(e?.target?.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md appearance-none focus:outline-none focus:ring-1 focus:ring-blue-500"
                 >
                   <option>Pakistan, Mulkisan Time</option>

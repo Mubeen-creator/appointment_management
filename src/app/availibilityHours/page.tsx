@@ -70,13 +70,13 @@ const Page = () => {
           <Dropdown
             start
             value={startTime}
-            onChange={(e) => setStartTime(e.target.value)}
+            onChange={(e) => setStartTime(e?.target?.value)}
             className="w-full md:w-auto"
           />
           <Dropdown
             end
             value={endTime}
-            onChange={(e) => setEndTime(e.target.value)}
+            onChange={(e) => setEndTime(e?.target?.value)}
             className="w-full md:w-auto mt-3 md:mt-0"
           />
         </div>
@@ -106,7 +106,7 @@ const Page = () => {
         <div className="flex items-center mt-4 md:mt-0">
           <button
             className="pr-4 cursor-pointer text-sm md:text-base"
-            onClick={() => router.push("/schedule")}
+            onClick={() => router?.push("/schedule")}
           >
             Set up later
           </button>

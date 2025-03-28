@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { RootState, useAppSelector } from "@/store/store";
 import { useRouter } from "next/navigation";
 const useConfirmation = () => {
-  const appointment = useAppSelector((state: RootState) => state.appointment);
+  const appointment = useAppSelector((state: RootState) => state?.appointment);
   const router = useRouter();
   const [countdown, setCountdown] = useState(3); // Countdown timer (in seconds)
 

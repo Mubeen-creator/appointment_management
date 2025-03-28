@@ -14,7 +14,7 @@ const useSchedule = () => {
 
   const dispatch = useAppDispatch();
   const router = useRouter();
-  const user = useAppSelector((state: RootState) => state.user);
+  const user = useAppSelector((state: RootState) => state?.user);
 
   const timeSlots = [
     "9:00am",
@@ -29,40 +29,40 @@ const useSchedule = () => {
   ];
 
   const daysInMonth = useMemo(() => {
-    const year = currentMonth.getFullYear();
-    const month = currentMonth.getMonth();
-    const days = new Date(year, month + 1, 0).getDate();
-    return Array.from({ length: days }, (_, i) => i + 1);
+    const year = currentMonth?.getFullYear();
+    const month = currentMonth?.getMonth();
+    const days = new Date(year, month + 1, 0)?.getDate();
+    return Array?.from({ length: days }, (_, i) => i + 1);
   }, [currentMonth]);
 
   const firstDayOfMonth = useMemo(() => {
     return new Date(
-      currentMonth.getFullYear(),
-      currentMonth.getMonth(),
+      currentMonth?.getFullYear(),
+      currentMonth?.getMonth(),
       1
     ).getDay();
   }, [currentMonth]);
 
-  const monthName = currentMonth.toLocaleString("default", {
+  const monthName = currentMonth?.toLocaleString("default", {
     month: "long",
     year: "numeric",
   });
 
   const handlePrevMonth = () => {
     setCurrentMonth(
-      new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1)
+      new Date(currentMonth?.getFullYear(), currentMonth?.getMonth() - 1, 1)
     );
   };
 
   const handleNextMonth = () => {
     setCurrentMonth(
-      new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1)
+      new Date(currentMonth?.getFullYear(), currentMonth?.getMonth() + 1, 1)
     );
   };
 
   const handleDateSelect = (day: number) => {
     setSelectedDate(
-      new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day)
+      new Date(currentMonth?.getFullYear(), currentMonth?.getMonth(), day)
     );
   };
 
@@ -72,12 +72,12 @@ const useSchedule = () => {
 
   const handleSchedule = () => {
     if (selectedDate && selectedTime) {
-      const dateString = selectedDate.toISOString().split("T")[0]; // Format: YYYY-MM-DD
+      const dateString = selectedDate?.toISOString()?.split("T")[0]; // Format: YYYY-MM-DD
       dispatch(
         setAppointment({
           date: dateString,
           time: selectedTime,
-          requesterEmail: user.email,
+          requesterEmail: user?.email,
           hostEmail: "",
           message: "",
         })

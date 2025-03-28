@@ -21,7 +21,7 @@ export async function PUT(request: Request) {
     const db = client.db("appointmentManagement");
 
     // Check if user exists
-    const existingUser = await db.collection("users").findOne({ email });
+    const existingUser = await db?.collection("users").findOne({ email });
     if (!existingUser) {
       return NextResponse.json({ message: "User not found" }, { status: 404 });
     }

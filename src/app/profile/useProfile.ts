@@ -26,7 +26,7 @@ const useProfile = () => {
   const [country, setCountry] = useState("Pakistan");
   const [timeZone, setTimeZone] = useState("Pakistan, Mulkisan Time");
   const [profilePicture, setProfilePicture] = useState(
-    user.profilePicture || null
+    user?.profilePicture || null
   );
   const [loading, setLoading] = useState(true);
   // State for delete confirmation popup
@@ -34,10 +34,10 @@ const useProfile = () => {
 
   // Initialize form state from Redux
   useEffect(() => {
-    if (user.userName) setName(user.userName);
-    if (user.welcomeMessage) setWelcomeMessage(user.welcomeMessage);
-    if (user.profilePicture) setProfilePicture(user.profilePicture);
-  }, [user.userName, user.welcomeMessage, user.profilePicture]);
+    if (user?.userName) setName(user?.userName);
+    if (user?.welcomeMessage) setWelcomeMessage(user?.welcomeMessage);
+    if (user?.profilePicture) setProfilePicture(user?.profilePicture);
+  }, [user?.userName, user?.welcomeMessage, user?.profilePicture]);
 
   const handleLogout = () => {
     dispatch(logout());
@@ -52,20 +52,20 @@ const useProfile = () => {
         const response = await fetch(`/api/get-user?email=${user.email}`);
         if (response.ok) {
           const userData = await response.json();
-          setName(userData.fullName || "");
-          setWelcomeMessage(userData.welcomeMessage || "");
-          setLanguage(userData.language || "English");
-          setDateFormat(userData.dateFormat || "DD/MM/YYYY");
-          setTimeFormat(userData.timeFormat || "12h (am/pm)");
-          setCountry(userData.country || "Pakistan");
-          setTimeZone(userData.timeZone || "Pakistan, Mulkisan Time");
-          setProfilePicture(userData.profilePicture || null);
+          setName(userData?.fullName || "");
+          setWelcomeMessage(userData?.welcomeMessage || "");
+          setLanguage(userData?.language || "English");
+          setDateFormat(userData?.dateFormat || "DD/MM/YYYY");
+          setTimeFormat(userData?.timeFormat || "12h (am/pm)");
+          setCountry(userData?.country || "Pakistan");
+          setTimeZone(userData?.timeZone || "Pakistan, Mulkisan Time");
+          setProfilePicture(userData?.profilePicture || null);
           dispatch(
             setUser({
               ...user,
-              fullName: userData.fullName || "",
-              welcomeMessage: userData.welcomeMessage || "",
-              profilePicture: userData.profilePicture || null,
+              fullName: userData?.fullName || "",
+              welcomeMessage: userData?.welcomeMessage || "",
+              profilePicture: userData?.profilePicture || null,
             })
           );
         }
@@ -84,7 +84,7 @@ const useProfile = () => {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          email: user.email,
+          email: user?.email,
           fullName: name,
           welcomeMessage,
           language,
@@ -115,19 +115,19 @@ const useProfile = () => {
   };
 
   const handlePictureUpload = async (event: any) => {
-    const file = event.target.files[0];
+    const file = event?.target?.files[0];
     if (!file) return;
     const formData = new FormData();
-    formData.append("profilePicture", file);
-    formData.append("email", user.email);
+    formData?.append("profilePicture", file);
+    formData?.append("email", user.email);
     try {
       const response = await fetch("/api/upload-profile-picture", {
         method: "POST",
         body: formData,
       });
-      if (response.ok) {
+      if (response?.ok) {
         const result = await response.json();
-        setProfilePicture(result.imageUrl);
+        setProfilePicture(result?.imageUrl);
         alert("Profile picture updated successfully!");
       } else {
         alert("Failed to upload profile picture.");

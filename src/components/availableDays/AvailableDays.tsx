@@ -20,8 +20,8 @@ const AvailableDays: React.FC<AvailableDaysProps> = ({
   setSelectedDays,
 }) => {
   const toggleDay = (day: string) => {
-    if (selectedDays.includes(day)) {
-      setSelectedDays(selectedDays.filter((d) => d !== day));
+    if (selectedDays?.includes(day)) {
+      setSelectedDays(selectedDays?.filter((d) => d !== day));
     } else {
       setSelectedDays([...selectedDays, day]);
     }
@@ -33,24 +33,24 @@ const AvailableDays: React.FC<AvailableDaysProps> = ({
       <div className="border border-gray-300 w-full rounded-sm overflow-hidden">
         {/* Mobile view - Stack vertically */}
         <div className="flex flex-col md:hidden">
-          {days.map((day, index) => (
+          {days?.map((day, index) => (
             <div
               key={day}
               className={`flex items-center justify-between px-4 py-3 ${
-                index !== days.length - 1 ? "border-b border-gray-300" : ""
+                index !== days?.length - 1 ? "border-b border-gray-300" : ""
               }`}
             >
               <label
-                htmlFor={`mobile-${day.toLowerCase()}`}
+                htmlFor={`mobile-${day?.toLowerCase()}`}
                 className="text-sm"
               >
                 {day}
               </label>
               <input
                 type="checkbox"
-                id={`mobile-${day.toLowerCase()}`}
-                name={day.toLowerCase()}
-                checked={selectedDays.includes(day)}
+                id={`mobile-${day?.toLowerCase()}`}
+                name={day?.toLowerCase()}
+                checked={selectedDays?.includes(day)}
                 onChange={() => toggleDay(day)}
                 className="form-checkbox h-4 w-4"
               />
@@ -64,19 +64,19 @@ const AvailableDays: React.FC<AvailableDaysProps> = ({
             <div
               key={day}
               className={`flex flex-col items-center px-2 lg:px-5 py-4 ${
-                index !== days.length - 1 ? "border-r border-gray-300" : ""
+                index !== days?.length - 1 ? "border-r border-gray-300" : ""
               }`}
             >
               <input
                 type="checkbox"
-                id={day.toLowerCase()}
-                name={day.toLowerCase()}
-                checked={selectedDays.includes(day)}
+                id={day?.toLowerCase()}
+                name={day?.toLowerCase()}
+                checked={selectedDays?.includes(day)}
                 onChange={() => toggleDay(day)}
                 className="form-checkbox h-4 w-4"
               />
               <label
-                htmlFor={day.toLowerCase()}
+                htmlFor={day?.toLowerCase()}
                 className="text-xs lg:text-sm mt-1 text-center"
               >
                 {day}

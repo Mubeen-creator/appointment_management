@@ -53,11 +53,13 @@ const Page = () => {
               Muhammad Talha
             </p>
           </div>
+
           {/* date and time */}
           <div className="mt-2 flex items-center justify-start">
             <CiCalendar size={20} className="text-gray-600 flex-shrink-0" />
             <p className="ml-2 font-semibold text-gray-500 text-sm md:text-base break-words">
-              {appointment.time}, {appointment.date}
+              {appointment?.currentAppointment?.time},{" "}
+              {appointment?.currentAppointment?.date}
             </p>
           </div>
           {/* country time */}

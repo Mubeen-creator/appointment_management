@@ -5,7 +5,7 @@ import { NextResponse } from "next/server";
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const email = searchParams.get("email");
+    const email = searchParams?.get("email");
 
     if (!email) {
       return NextResponse.json(
@@ -15,9 +15,9 @@ export async function GET(request: Request) {
     }
 
     const client = await clientPromise;
-    const db = client.db("appointmentManagement");
+    const db = client?.db("appointmentManagement");
 
-    const user = await db.collection("users").findOne({ email });
+    const user = await db?.collection("users")?.findOne({ email });
     if (!user) {
       return NextResponse.json({ message: "User not found" }, { status: 404 });
     }

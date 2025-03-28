@@ -23,9 +23,9 @@ export default function Home() {
     if (session?.user) {
       dispatch(
         setUser({
-          email: session.user.email ?? "", // Fallback to empty string if undefined
-          fullName: session.user.fullName ?? "",
-          userName: session.user.userName ?? "",
+          email: session?.user?.email ?? "", // Fallback to empty string if undefined
+          fullName: session?.user?.fullName ?? "",
+          userName: session?.user?.userName ?? "",
           password: "", // Password not stored in session
         })
       );
@@ -108,7 +108,7 @@ export default function Home() {
             type="email"
             placeholder="Email"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => setEmail(e?.target?.value)}
           />
         </div>
 
@@ -122,7 +122,7 @@ export default function Home() {
                 type="text"
                 placeholder="Full Name"
                 value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
+                onChange={(e) => setFullName(e?.target?.value)}
               />
             </div>
             <div className="w-full mt-4">
@@ -133,7 +133,7 @@ export default function Home() {
                 type="text"
                 placeholder="Username"
                 value={userName}
-                onChange={(e) => setUserName(e.target.value)}
+                onChange={(e) => setUserName(e?.target?.value)}
               />
             </div>
           </>
@@ -149,7 +149,7 @@ export default function Home() {
             type="password"
             placeholder="Password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(e) => setPassword(e?.target?.value)}
             showPasswordToggle={true}
           />
         </div>

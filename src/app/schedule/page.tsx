@@ -39,7 +39,7 @@ export default function MeetingScheduler() {
         <div className="bg-white rounded-lg shadow-lg max-w-4xl w-full flex flex-col md:flex-row p-4 md:p-6">
           {/* Left Section: User Info */}
           <div className="w-full md:w-1/3 flex flex-col md:pr-6 mb-4 md:mb-0">
-            <h1 className="font-semibold text-gray-500">{user.userName}</h1>
+            <h1 className="font-semibold text-gray-500">{user?.userName}</h1>
             <span className="text-black font-bold text-xl md:text-2xl">
               30 Minute Meeting
             </span>
@@ -94,15 +94,15 @@ export default function MeetingScheduler() {
                   <div>Sun</div>
                 </div>
                 <div className="grid grid-cols-7 gap-1 mt-2 text-center">
-                  {Array.from({ length: firstDayOfMonth }).map((_, i) => (
+                  {Array?.from({ length: firstDayOfMonth })?.map((_, i) => (
                     <div key={`empty-${i}`} />
                   ))}
                   {daysInMonth.map((day) => {
                     const isSelected =
                       selectedDate?.getDate() === day &&
-                      selectedDate?.getMonth() === currentMonth.getMonth() &&
+                      selectedDate?.getMonth() === currentMonth?.getMonth() &&
                       selectedDate?.getFullYear() ===
-                        currentMonth.getFullYear();
+                        currentMonth?.getFullYear();
                     return (
                       <button
                         key={day}
@@ -151,7 +151,7 @@ export default function MeetingScheduler() {
                 })}
               </p>
               <div className="space-y-2 w-full cursor-pointer">
-                {timeSlots.map((time) => (
+                {timeSlots?.map((time) => (
                   <button
                     key={time}
                     onClick={() => handleTimeSelect(time)}

@@ -6,7 +6,7 @@ import { NextResponse } from "next/server";
 export async function POST(request: Request) {
   console.log(
     "\n\n[API] /api/appointments triggered at",
-    new Date().toISOString()
+    new Date()?.toISOString()
   );
 
   try {
@@ -15,18 +15,18 @@ export async function POST(request: Request) {
 
     // Validate required fields
     const requiredFields = ["requesterEmail", "hostEmail", "date", "time"];
-    const missingFields = requiredFields.filter((field) => !payload[field]);
+    const missingFields = requiredFields?.filter((field) => !payload[field]);
 
     if (missingFields.length > 0) {
       console.error("[API] Missing fields:", missingFields);
       return NextResponse.json(
-        { message: `Missing required fields: ${missingFields.join(", ")}` },
+        { message: `Missing required fields: ${missingFields?.join(", ")}` },
         { status: 400 }
       );
     }
 
     const client = await clientPromise;
-    const db = client.db("appointmentManagement");
+    const db = client?.db("appointmentManagement");
 
     const appointment = {
       ...payload,
@@ -42,7 +42,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json(
       {
-        id: result.insertedId.toString(),
+        id: result?.insertedId?.toString(),
         ...appointment,
       },
       { status: 201 }
@@ -60,8 +60,8 @@ export async function POST(request: Request) {
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const email = searchParams.get("email"); // Get the user's email from query params
-    const hostEmail = searchParams.get("hostEmail"); // Get the host's email from query params
+    const email = searchParams?.get("email"); // Get the user's email from query params
+    const hostEmail = searchParams?.get("hostEmail"); // Get the host's email from query params
 
     if (!email && !hostEmail) {
       return NextResponse.json(
@@ -71,7 +71,7 @@ export async function GET(request: Request) {
     }
 
     const client = await clientPromise;
-    const db = client.db("appointmentManagement");
+    const db = client?.db("appointmentManagement");
 
     let query = {};
     if (email) {
@@ -81,9 +81,9 @@ export async function GET(request: Request) {
     }
 
     const appointments = await db
-      .collection("appointments")
-      .find(query)
-      .toArray();
+      ?.collection("appointments")
+      ?.find(query)
+      ?.toArray();
 
     return NextResponse.json(appointments, { status: 200 });
   } catch (error) {

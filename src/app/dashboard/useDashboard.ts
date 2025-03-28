@@ -25,12 +25,12 @@ const useDashboard = () => {
   const [endDate, setEndDate] = useState<Date | null>(null);
 
   const dispatch = useAppDispatch();
-  const user = useAppSelector((state: RootState) => state.user);
+  const user = useAppSelector((state: RootState) => state?.user);
   const appointmentsHistory = useAppSelector(
-    (state: RootState) => state.appointment.appointmentsHistory
+    (state: RootState) => state?.appointment?.appointmentsHistory
   );
   const hostAppointments = useAppSelector(
-    (state: RootState) => state.appointment.hostAppointments
+    (state: RootState) => state?.appointment?.hostAppointments
   );
   const router = useRouter();
   const profileRoute = "/profile";
@@ -52,8 +52,8 @@ const useDashboard = () => {
   useEffect(() => {
     const fetchAppointments = async () => {
       try {
-        const response = await fetch(`/api/appointments?email=${user.email}`);
-        const data = await response.json();
+        const response = await fetch(`/api/appointments?email=${user?.email}`);
+        const data = await response?.json();
         dispatch(setAppointmentsHistory(data));
 
         const hostResponse = await fetch(
@@ -94,10 +94,10 @@ const useDashboard = () => {
         const updatedAppointment = await response.json();
         const [updatedAppointments, updatedHostAppointments] =
           await Promise.all([
-            fetch(`/api/appointments?email=${user.email}`).then((res) =>
+            fetch(`/api/appointments?email=${user?.email}`).then((res) =>
               res.json()
             ),
-            fetch(`/api/appointments?hostEmail=${user.email}`).then((res) =>
+            fetch(`/api/appointments?hostEmail=${user?.email}`).then((res) =>
               res.json()
             ),
           ]);
@@ -108,7 +108,7 @@ const useDashboard = () => {
           updateAppointmentStatus({
             id: appointmentId,
             status: newStatus as "pending" | "accepted" | "rejected",
-            meetLink: updatedAppointment.meetLink, // Update Redux with meetLink
+            meetLink: updatedAppointment?.meetLink, // Update Redux with meetLink
           })
         );
         setIsModalOpen(false);
@@ -178,7 +178,7 @@ const useDashboard = () => {
       case "Upcoming":
         return appointmentDate >= today;
       case "Pending":
-        return appointment.status === "pending";
+        return appointment?.status === "pending";
       case "Past":
         return appointmentDate < today;
       case "DateRange":
@@ -196,7 +196,7 @@ const useDashboard = () => {
       "PRODID:-//xAI//Grok 3//EN",
       ...filteredAppointments.map((appointment) => {
         const startDateTime = parse(
-          `${appointment.date} ${appointment.time}`,
+          `${appointment?.date} ${appointment?.time}`,
           "yyyy-MM-dd h:mma",
           new Date()
         );
@@ -211,13 +211,13 @@ const useDashboard = () => {
           `DTSTART:${formatICSDate(startDateTime)}`,
           `DTEND:${formatICSDate(endDateTime)}`,
           `SUMMARY:Meeting with ${
-            appointment.tag === "Sent"
-              ? appointment.hostEmail
-              : appointment.requesterEmail
+            appointment?.tag === "Sent"
+              ? appointment?.hostEmail
+              : appointment?.requesterEmail
           }`,
-          `DESCRIPTION:${appointment.message || "No message"}`,
-          `ORGANIZER;CN=${appointment.hostEmail}:mailto:${appointment.hostEmail}`,
-          `ATTENDEE;CN=${appointment.requesterEmail}:mailto:${appointment.requesterEmail}`,
+          `DESCRIPTION:${appointment?.message || "No message"}`,
+          `ORGANIZER;CN=${appointment?.hostEmail}:mailto:${appointment?.hostEmail}`,
+          `ATTENDEE;CN=${appointment?.requesterEmail}:mailto:${appointment?.requesterEmail}`,
           "STATUS:CONFIRMED",
           "END:VEVENT",
         ].join("\r\n");

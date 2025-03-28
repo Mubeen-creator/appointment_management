@@ -13,8 +13,8 @@ cloudinary.config({
 export async function POST(request: Request) {
   try {
     const formData = await request.formData();
-    const file = formData.get("profilePicture") as Blob | null;
-    const email = formData.get("email") as string | null;
+    const file = formData?.get("profilePicture") as Blob | null;
+    const email = formData?.get("email") as string | null;
 
     if (!file || !email) {
       return NextResponse.json(
@@ -27,12 +27,12 @@ export async function POST(request: Request) {
 
     // Convert Blob to a format Cloudinary can understand (Buffer)
     const arrayBuffer = await file.arrayBuffer();
-    const bufferNew = Buffer.from(arrayBuffer);
+    const bufferNew = Buffer?.from(arrayBuffer);
 
     // Convert buffer to base64
     const bufferBase64 = bufferNew.toString("base64");
     // Prefix with the correct MIME type
-    const imageData = `data:${file.type};base64,${bufferBase64}`;
+    const imageData = `data:${file?.type};base64,${bufferBase64}`;
 
     // Upload the image to Cloudinary
     const cloudinaryUploadResponse = await new Promise((resolve, reject) => {

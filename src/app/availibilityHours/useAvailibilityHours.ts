@@ -10,7 +10,7 @@ const useAvailibilityHours = () => {
   const [endTime, setEndTime] = useState("");
   const [selectedDays, setSelectedDays] = useState<string[]>([]);
 
-  const user = useAppSelector((state: RootState) => state.user);
+  const user = useAppSelector((state: RootState) => state?.user);
   const dispatch = useAppDispatch();
   const router = useRouter();
   const containerRef = useRef<HTMLDivElement>(null);
@@ -21,9 +21,9 @@ const useAvailibilityHours = () => {
     if (status === "authenticated" && session?.user) {
       dispatch(
         setUser({
-          email: session.user.email ?? "",
-          fullName: session.user.fullName ?? "",
-          userName: session.user.userName ?? "",
+          email: session?.user?.email ?? "",
+          fullName: session?.user?.fullName ?? "",
+          userName: session?.user?.userName ?? "",
           password: "", // Password not stored in session
         })
       );
@@ -31,7 +31,7 @@ const useAvailibilityHours = () => {
   }, [session, status, dispatch]);
 
   const handleContinue = async () => {
-    if (!startTime || !endTime || selectedDays.length === 0) {
+    if (!startTime || !endTime || selectedDays?.length === 0) {
       alert("Please fill all availability fields");
       return;
     }
@@ -49,7 +49,7 @@ const useAvailibilityHours = () => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          email: user.email,
+          email: user?.email,
           startTime,
           endTime,
           availableDays: selectedDays,

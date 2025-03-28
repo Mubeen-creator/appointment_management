@@ -19,9 +19,9 @@ export async function DELETE(request: Request) {
   try {
     await client.connect();
     const db = client.db("appointmentManagement"); // Replace with your actual database name
-    const usersCollection = db.collection("users");
+    const usersCollection = db?.collection("users");
 
-    const result = await usersCollection.deleteOne({ email });
+    const result = await usersCollection?.deleteOne({ email });
 
     if (result.deletedCount === 1) {
       return NextResponse.json(

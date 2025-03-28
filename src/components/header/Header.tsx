@@ -14,16 +14,16 @@ function Header() {
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
+        dropdownRef?.current &&
+        !dropdownRef?.current?.contains(event?.target as Node)
       ) {
         setIsOpen(false);
       }
     }
 
-    document.addEventListener("mousedown", handleClickOutside);
+    document?.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
+      document?.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
 

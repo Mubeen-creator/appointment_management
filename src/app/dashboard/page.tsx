@@ -108,7 +108,7 @@ export default function ScheduledEvents() {
 
         {/* Sidebar Options */}
         <div className="mt-4 px-2">
-          {sidebarOptions.map(({ name, icon: Icon }) => (
+          {sidebarOptions?.map(({ name, icon: Icon }) => (
             <div
               key={name}
               className={`flex items-center px-4 py-3 rounded-md cursor-pointer ${
@@ -126,7 +126,7 @@ export default function ScheduledEvents() {
 
         {/* Bottom Options */}
         <div className="mt-auto px-2 mb-4">
-          {bottomOptions.map(({ name, icon: Icon, route, action }) => (
+          {bottomOptions?.map(({ name, icon: Icon, route, action }) => (
             <div
               key={name}
               className="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-md cursor-pointer mt-1"
@@ -173,8 +173,8 @@ export default function ScheduledEvents() {
                     <FiChevronDown size={16} className="ml-2" />
                   </div>
                   <div className="text-sm text-gray-500">
-                    Displaying {filteredAppointments.length} of{" "}
-                    {allAppointments.length} Events
+                    Displaying {filteredAppointments?.length} of{" "}
+                    {allAppointments?.length} Events
                   </div>
                 </div>
               </div>
@@ -289,16 +289,16 @@ export default function ScheduledEvents() {
                         <div className="flex flex-col md:flex-row md:justify-between">
                           <div>
                             <div className="text-sm text-gray-600">
-                              {appointment.time}
+                              {appointment?.time}
                             </div>
                             <div className="font-medium">
                               Meeting with{" "}
                               {appointment.tag === "Sent"
-                                ? appointment.hostEmail
-                                : appointment.requesterEmail}
+                                ? appointment?.hostEmail
+                                : appointment?.requesterEmail}
                               <span
                                 className={`ml-2 inline-block px-2 py-1 text-xs font-semibold rounded-full ${
-                                  appointment.tag === "Sent"
+                                  appointment?.tag === "Sent"
                                     ? "bg-green-100 text-green-800"
                                     : "bg-blue-100 text-blue-800"
                                 }`}
@@ -326,13 +326,13 @@ export default function ScheduledEvents() {
                     </div>
                   ))}
 
-                  {filteredAppointments.length === 0 && (
+                  {filteredAppointments?.length === 0 && (
                     <div className="text-center text-sm text-gray-500 py-4">
                       No appointments found for this category
                     </div>
                   )}
 
-                  {filteredAppointments.length > 0 && (
+                  {filteredAppointments?.length > 0 && (
                     <div className="text-center text-sm text-gray-500 py-4">
                       You've reached the end of the list
                     </div>
@@ -350,53 +350,56 @@ export default function ScheduledEvents() {
                   Appointment Details
                 </h2>
                 <p>
-                  <strong>Date:</strong> {selectedAppointment.date}
+                  <strong>Date:</strong> {selectedAppointment?.date}
                 </p>
                 <p>
-                  <strong>Time:</strong> {selectedAppointment.time}
+                  <strong>Time:</strong> {selectedAppointment?.time}
                 </p>
                 <p>
-                  <strong>Status:</strong> {selectedAppointment.status}
+                  <strong>Status:</strong> {selectedAppointment?.status}
                 </p>
                 <p>
                   <strong>Requester:</strong>{" "}
-                  {selectedAppointment.requesterEmail}
+                  {selectedAppointment?.requesterEmail}
                 </p>
                 <p>
-                  <strong>Host:</strong> {selectedAppointment.hostEmail}
+                  <strong>Host:</strong> {selectedAppointment?.hostEmail}
                 </p>
                 <p>
-                  <strong>Type:</strong> {selectedAppointment.tag}
+                  <strong>Type:</strong> {selectedAppointment?.tag}
                 </p>
                 {selectedAppointment.message && (
                   <p>
-                    <strong>Message:</strong> {selectedAppointment.message}
+                    <strong>Message:</strong> {selectedAppointment?.message}
                   </p>
                 )}
-                {selectedAppointment.timeZone && (
+                {selectedAppointment?.timeZone && (
                   <p>
-                    <strong>Time Zone:</strong> {selectedAppointment.timeZone}
+                    <strong>Time Zone:</strong> {selectedAppointment?.timeZone}
                   </p>
                 )}
-                {selectedAppointment.meetLink && (
+                {selectedAppointment?.meetLink && (
                   <p>
                     <strong>Google Meet Link:</strong>{" "}
                     <a
-                      href={selectedAppointment.meetLink}
+                      href={selectedAppointment?.meetLink}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-blue-600 hover:underline"
                     >
-                      {selectedAppointment.meetLink}
+                      {selectedAppointment?.meetLink}
                     </a>
                   </p>
                 )}
 
-                {selectedAppointment.tag === "Received" && (
+                {selectedAppointment?.tag === "Received" && (
                   <div className="mt-4 space-x-2">
                     <button
                       onClick={() =>
-                        handleUpdateStatus(selectedAppointment._id!, "accepted")
+                        handleUpdateStatus(
+                          selectedAppointment?._id!,
+                          "accepted"
+                        )
                       }
                       className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
                     >
@@ -404,7 +407,10 @@ export default function ScheduledEvents() {
                     </button>
                     <button
                       onClick={() =>
-                        handleUpdateStatus(selectedAppointment._id!, "rejected")
+                        handleUpdateStatus(
+                          selectedAppointment?._id!,
+                          "rejected"
+                        )
                       }
                       className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
                     >
@@ -412,7 +418,7 @@ export default function ScheduledEvents() {
                     </button>
                     <button
                       onClick={() =>
-                        handleUpdateStatus(selectedAppointment._id!, "pending")
+                        handleUpdateStatus(selectedAppointment?._id!, "pending")
                       }
                       className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
                     >

@@ -16,35 +16,37 @@ const EditAvailabilityPage = () => {
   const dispatch = useAppDispatch();
   const router = useRouter();
 
-  const availability = useAppSelector((state: RootState) => state.availability);
-  const user = useAppSelector((state: RootState) => state.user);
+  const availability = useAppSelector(
+    (state: RootState) => state?.availability
+  );
+  const user = useAppSelector((state: RootState) => state?.user);
 
-  const [startTime, setStartTime] = useState(availability.startTime || "");
-  const [endTime, setEndTime] = useState(availability.endTime || "");
+  const [startTime, setStartTime] = useState(availability?.startTime || "");
+  const [endTime, setEndTime] = useState(availability?.endTime || "");
   const [selectedDays, setSelectedDays] = useState<string[]>(
-    availability.availableDays || []
+    availability?.availableDays || []
   );
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (status === "unauthenticated") {
       router.push("/");
-    } else if (status === "authenticated" && !user.email) {
-      router.push("/availibilityHours");
+    } else if (status === "authenticated" && !user?.email) {
+      router?.push("/availibilityHours");
     }
   }, [status, user, router]);
 
   useEffect(() => {
     const fetchAvailability = async () => {
-      if (!user.email || availability.startTime) return;
+      if (!user.email || availability?.startTime) return;
       try {
         const response = await fetch(`/api/get-user?email=${user.email}`);
         const data = await response.json();
-        if (response.ok && data.availability) {
-          setStartTime(data.availability.startTime);
-          setEndTime(data.availability.endTime);
-          setSelectedDays(data.availability.availableDays);
-          dispatch(setAvailability(data.availability));
+        if (response.ok && data?.availability) {
+          setStartTime(data?.availability?.startTime);
+          setEndTime(data?.availability?.endTime);
+          setSelectedDays(data?.availability?.availableDays);
+          dispatch(setAvailability(data?.availability));
         }
       } catch (error) {
         console.error("Fetch availability error:", error);
@@ -54,7 +56,7 @@ const EditAvailabilityPage = () => {
   }, [user.email, dispatch]);
 
   const handleSave = async () => {
-    if (!startTime || !endTime || selectedDays.length === 0) {
+    if (!startTime || !endTime || selectedDays?.length === 0) {
       toast.error("Please fill all availability fields");
       return;
     }
@@ -65,7 +67,7 @@ const EditAvailabilityPage = () => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          email: user.email,
+          email: user?.email,
           startTime,
           endTime,
           availableDays: selectedDays,
@@ -81,7 +83,7 @@ const EditAvailabilityPage = () => {
         toast.success("Availability updated successfully!");
         router.push("/dashboard");
       } else {
-        toast.error(result.message || "Failed to update availability");
+        toast.error(result?.message || "Failed to update availability");
       }
     } catch (error) {
       console.error("Update availability error:", error);
@@ -109,13 +111,13 @@ const EditAvailabilityPage = () => {
             <Dropdown
               start
               value={startTime}
-              onChange={(e) => setStartTime(e.target.value)}
+              onChange={(e) => setStartTime(e?.target?.value)}
               className="w-full sm:w-1/2"
             />
             <Dropdown
               end
               value={endTime}
-              onChange={(e) => setEndTime(e.target.value)}
+              onChange={(e) => setEndTime(e?.target?.value)}
               className="w-full sm:w-1/2"
             />
           </div>

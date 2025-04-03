@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 const useConfirmation = () => {
   const appointment = useAppSelector((state: RootState) => state?.appointment);
   const router = useRouter();
-  const [countdown, setCountdown] = useState(3); // Countdown timer (in seconds)
+  const [countdown, setCountdown] = useState(3);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -14,7 +14,7 @@ const useConfirmation = () => {
 
     if (countdown === 0) {
       clearInterval(timer);
-      router.push("/dashboard"); // Redirect to dashboard
+      router.push("/dashboard");
     }
 
     return () => clearInterval(timer);

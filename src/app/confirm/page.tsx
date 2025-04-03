@@ -26,19 +26,14 @@ export default function ConfirmMeeting() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
       <div className="bg-white rounded-lg shadow-lg w-full max-w-3xl p-4 md:p-8 relative">
-        {/* Main Content */}
         <div className="flex flex-col md:flex-row">
-          {/* Left Section: User Details and Back Arrow */}
           <div className="w-full md:w-1/3 md:pr-6 mb-6 md:mb-0">
-            {/* Back Arrow */}
             <button
               className="mb-4 text-blue-500 border p-2 border-gray-300 rounded-full cursor-pointer"
               onClick={() => router?.push("/schedule")}
             >
               <ArrowLeftIcon className="h-5 w-5" />
             </button>
-
-            {/* Meeting Details */}
             <div>
               <h1 className="font-medium text-gray-600">{user?.userName}</h1>
               <p className="text-lg md:text-xl font-bold text-black mt-1">
@@ -74,20 +69,13 @@ export default function ConfirmMeeting() {
               </div>
             </div>
           </div>
-
-          {/* Vertical Separator - Hide on mobile */}
           <div className="hidden md:block w-px bg-gray-200 mx-6"></div>
-
-          {/* Horizontal Separator - Show only on mobile */}
           <hr className="border-t border-gray-200 my-6 md:hidden" />
-
-          {/* Right Section: Form Inputs */}
           <div className="w-full md:w-2/3">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">
               Enter Details
             </h2>
             <form className="space-y-4 md:space-y-6">
-              {/* Name Field */}
               <div>
                 <label
                   htmlFor="name"
@@ -102,8 +90,6 @@ export default function ConfirmMeeting() {
                   onChange={(e) => setName(e?.target?.value)}
                 />
               </div>
-
-              {/* Email Field */}
               <div>
                 <label
                   htmlFor="email"
@@ -118,8 +104,6 @@ export default function ConfirmMeeting() {
                   onChange={(e) => setEmail(e?.target?.value)}
                 />
               </div>
-
-              {/* Notes Field */}
               <div>
                 <label
                   htmlFor="notes"
@@ -164,8 +148,6 @@ export default function ConfirmMeeting() {
             </form>
           </div>
         </div>
-
-        {/* Footer Links */}
         <div className="mt-6 md:mt-2 text-xs text-gray-500 flex justify-start gap-x-6 md:gap-x-10">
           <a href="#">Cookie Settings</a>
           <a href="#">Report abuse</a>

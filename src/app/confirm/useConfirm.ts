@@ -15,7 +15,6 @@ const useConfirm = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
 
-  // Get the current appointment details from Redux
   const { date, time } = useAppSelector(
     (state: RootState) => state?.appointment?.currentAppointment
   );
@@ -23,19 +22,17 @@ const useConfirm = () => {
   const handleConfirm = async () => {
     event?.preventDefault();
     try {
-      // Validate fields
       if (!user?.email || !email || !date || !time || !name) {
         alert("Please fill all required fields");
         return;
       }
 
-      // Step 1: Create the appointment
       const appointmentResponse = await axios.post("/api/appointments", {
-        requesterEmail: user?.email, // Requester's email from Redux
-        hostEmail: email, // Host email from user input
+        requesterEmail: user?.email,
+        hostEmail: email,
         date,
         time,
-        message: notes, // Message from user input
+        message: notes,
       });
 
       if (appointmentResponse?.status !== 201) {
@@ -56,9 +53,7 @@ const useConfirm = () => {
         },
       };
 
-      console.log("[Frontend] Sending email request:", emailPayload); // Debugging log
-
-      // Hit the correct API route `/api/send-email`
+      console.log("[Frontend] Sending email request:", emailPayload);
       const emailResponse = await axios.post("/api/send-email", emailPayload);
 
       if (emailResponse.status !== 200) {

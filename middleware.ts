@@ -2,10 +2,17 @@ import { withAuth } from "next-auth/middleware";
 
 export default withAuth({
   pages: {
-    signIn: "/", // Redirect to home page if not authenticated
+    signIn: "/",
   },
 });
 
 export const config = {
-  matcher: ["/dashboard", "/availibilityHours"], // Protect these routes
+  matcher: [
+    "/dashboard",
+    "/availibilityHours",
+    "/profile",
+    "/schedule",
+    "/confirm",
+    "/meeting-confirmation",
+  ],
 };

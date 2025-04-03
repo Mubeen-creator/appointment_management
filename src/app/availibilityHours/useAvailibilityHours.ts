@@ -1,7 +1,7 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
 import { setAvailability } from "@/store/slices/availabilitySlice";
-import { setUser } from "@/store/slices/userSlice"; // Import setUser
+import { setUser } from "@/store/slices/userSlice";
 import { useRouter } from "next/navigation";
 import { RootState, useAppDispatch, useAppSelector } from "@/store/store";
 import { useSession } from "next-auth/react";
@@ -14,9 +14,8 @@ const useAvailibilityHours = () => {
   const dispatch = useAppDispatch();
   const router = useRouter();
   const containerRef = useRef<HTMLDivElement>(null);
-  const { data: session, status } = useSession(); // Get session from NextAuth
+  const { data: session, status } = useSession();
 
-  // Sync Redux store with NextAuth session on page load
   useEffect(() => {
     if (status === "authenticated" && session?.user) {
       dispatch(
@@ -24,7 +23,7 @@ const useAvailibilityHours = () => {
           email: session?.user?.email ?? "",
           fullName: session?.user?.fullName ?? "",
           userName: session?.user?.userName ?? "",
-          password: "", // Password not stored in session
+          password: "",
         })
       );
     }
@@ -40,7 +39,7 @@ const useAvailibilityHours = () => {
 
     if (!user.email) {
       alert("User email is missing. Please sign in again.");
-      router.push("/"); // Redirect to sign-in page
+      router.push("/");
       return;
     }
 

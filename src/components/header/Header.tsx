@@ -1,35 +1,15 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import React, { useState, useEffect, useRef } from "react";
+import React from "react";
 import { GrLink } from "react-icons/gr";
 import { MdKeyboardArrowDown } from "react-icons/md";
+import useHeader from "./useHeader";
 
 function Header() {
-  const [isOpen, setIsOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-  const router = useRouter();
-
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (
-        dropdownRef?.current &&
-        !dropdownRef?.current?.contains(event?.target as Node)
-      ) {
-        setIsOpen(false);
-      }
-    }
-
-    document?.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document?.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
+  const { isOpen, setIsOpen, dropdownRef, router } = useHeader();
 
   return (
     <div className="w-full bg-white shadow-gray-600 shadow-sm h-auto flex items-center justify-between md:justify-end py-2 px-4 md:px-6 relative">
-      {/* Dropdown Section */}
       <div className="relative" ref={dropdownRef}>
         <button
           onClick={() => setIsOpen(!isOpen)}
@@ -43,8 +23,6 @@ function Header() {
             className={`transition-transform ${isOpen ? "rotate-180" : ""}`}
           />
         </button>
-
-        {/* Dropdown Menu */}
         {isOpen && (
           <div className="absolute left-0 mt-2 w-40 bg-white shadow-lg rounded-lg p-2 z-10">
             <ul className="text-gray-700">
@@ -70,8 +48,6 @@ function Header() {
           </div>
         )}
       </div>
-
-      {/* Copy Link Button */}
       <div
         className="flex items-center justify-center border border-gray-600 rounded-full gap-x-2 py-2 md:py-3 w-[130px] md:w-[150px] cursor-pointer ml-4 md:ml-10 mr-0 md:mr-10 lg:mr-20 xl:mr-40 2xl:mr-[300px]"
         onClick={() => router.push("/links")}

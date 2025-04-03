@@ -1,9 +1,7 @@
-// app/api/update-profile/route.ts
 import clientPromise from "@/app/lib/mongodb";
 import { NextResponse } from "next/server";
 
 export async function PUT(request: Request) {
-  // Changed from POST to PUT
   try {
     const {
       email,
@@ -20,13 +18,11 @@ export async function PUT(request: Request) {
     const client = await clientPromise;
     const db = client.db("appointmentManagement");
 
-    // Check if user exists
     const existingUser = await db?.collection("users").findOne({ email });
     if (!existingUser) {
       return NextResponse.json({ message: "User not found" }, { status: 404 });
     }
 
-    // Update user in MongoDB
     await db.collection("users").updateOne(
       { email },
       {

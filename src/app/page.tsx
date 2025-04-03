@@ -3,85 +3,25 @@
 import Input from "@/components/input/Input";
 import Button from "@/components/button/Button";
 import Image from "next/image";
-import { useState, useEffect } from "react";
-import { setUser, logout } from "../store/slices/userSlice";
-import { useRouter } from "next/navigation";
-import { signIn, signOut, useSession } from "next-auth/react";
-import { useAppDispatch } from "@/store/store";
+import useHomePage from "@/constants/useHomePage";
 
 export default function Home() {
-  const [email, setEmail] = useState("");
-  const [fullName, setFullName] = useState("");
-  const [userName, setUserName] = useState("");
-  const [password, setPassword] = useState("");
-  const [isSignUp, setIsSignUp] = useState(true);
-  const router = useRouter();
-  const dispatch = useAppDispatch();
-  const { data: session, status } = useSession();
-
-  useEffect(() => {
-    if (session?.user) {
-      dispatch(
-        setUser({
-          email: session?.user?.email ?? "", // Fallback to empty string if undefined
-          fullName: session?.user?.fullName ?? "",
-          userName: session?.user?.userName ?? "",
-          password: "", // Password not stored in session
-        })
-      );
-    }
-  }, [session, dispatch]);
-
-  const handleSignUp = async () => {
-    const userData = { email, fullName, userName, password };
-
-    try {
-      const response = await fetch("/api/signup", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(userData),
-      });
-
-      if (response.ok) {
-        const signInResponse = await signIn("credentials", {
-          redirect: false,
-          email,
-          password,
-        });
-
-        if (signInResponse?.ok) {
-          router.push("/availibilityHours");
-        } else {
-          alert("Sign-in after signup failed.");
-        }
-      }
-    } catch (error) {
-      console.error("Error during sign-up:", error);
-      alert("An error occurred. Please try again.");
-    }
-  };
-
-  const handleSignIn = async () => {
-    const signInResponse = await signIn("credentials", {
-      redirect: false,
-      email,
-      password,
-    });
-
-    if (signInResponse?.ok) {
-      router.push("/dashboard");
-    } else {
-      alert("Invalid credentials.");
-    }
-  };
-
-  const handleSignOut = async () => {
-    await signOut({ redirect: false });
-    dispatch(logout());
-    router.push("/");
-  };
+  const {
+    email,
+    setEmail,
+    fullName,
+    setFullName,
+    userName,
+    setUserName,
+    password,
+    setPassword,
+    isSignUp,
+    setIsSignUp,
+    session,
+    handleSignUp,
+    handleSignIn,
+    handleSignOut,
+  } = useHomePage();
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4">

@@ -1,8 +1,7 @@
-// src/app/api/delete-account/route.ts
 import { NextResponse } from "next/server";
 import { MongoClient } from "mongodb";
 
-const uri = process.env.MONGODB_URI; // Ensure this is set in your .env file
+const uri = process.env.MONGODB_URI;
 if (!uri) {
   throw new Error("MONGODB_URI is not defined in the environment variables.");
 }
@@ -18,7 +17,7 @@ export async function DELETE(request: Request) {
 
   try {
     await client.connect();
-    const db = client.db("appointmentManagement"); // Replace with your actual database name
+    const db = client.db("appointmentManagement");
     const usersCollection = db?.collection("users");
 
     const result = await usersCollection?.deleteOne({ email });

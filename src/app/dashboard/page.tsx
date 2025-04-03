@@ -12,11 +12,6 @@ import {
 } from "chart.js";
 import {
   FiPlus,
-  FiGrid,
-  FiPieChart,
-  FiClock,
-  FiSettings,
-  FiMoreVertical,
   FiChevronLeft,
   FiDownload,
   FiFilter,
@@ -25,8 +20,8 @@ import {
 import DatePicker from "react-datepicker";
 import useDashboard from "./useDashboard";
 import { FiChevronDown } from "react-icons/fi";
+import { datePickerStyles } from "../../constants/timeSlot";
 
-// Register Chart.js components
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -68,7 +63,6 @@ export default function ScheduledEvents() {
     allAppointments,
     filteredAppointments,
     exportToICS,
-    datePickerStyles,
     sidebarOptions,
     bottomOptions,
   } = useDashboard();
@@ -83,7 +77,6 @@ export default function ScheduledEvents() {
         ></div>
       )}
 
-      {/* Left Sidebar */}
       <div
         className={`fixed md:relative z-30 h-full transform ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
@@ -98,15 +91,11 @@ export default function ScheduledEvents() {
             <FiChevronLeft size={20} />
           </button>
         </div>
-
-        {/* Create Button */}
         <div className="p-4" onClick={() => router.push("schedule")}>
           <button className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-full py-2 px-4 flex items-center justify-center cursor-pointer">
             <FiPlus size={16} className="mr-2" /> Create
           </button>
         </div>
-
-        {/* Sidebar Options */}
         <div className="mt-4 px-2">
           {sidebarOptions?.map(({ name, icon: Icon }) => (
             <div
@@ -123,8 +112,6 @@ export default function ScheduledEvents() {
             </div>
           ))}
         </div>
-
-        {/* Bottom Options */}
         <div className="mt-auto px-2 mb-4">
           {bottomOptions?.map(({ name, icon: Icon, route, action }) => (
             <div
@@ -142,8 +129,6 @@ export default function ScheduledEvents() {
           ))}
         </div>
       </div>
-
-      {/* Main Content */}
       <div className="flex-1 bg-gray-50 overflow-auto md:pt-20 p-8">
         <div className="p-4 md:p-6">
           <div className="flex items-center justify-between mb-4">
@@ -341,8 +326,6 @@ export default function ScheduledEvents() {
               </div>
             </>
           )}
-
-          {/* Modal */}
           {isModalOpen && selectedAppointment && (
             <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
               <div className="bg-white p-6 rounded-lg max-w-md w-full">

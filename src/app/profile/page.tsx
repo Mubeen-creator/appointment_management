@@ -9,6 +9,7 @@ import {
 import Link from "next/link";
 import useProfile from "./useProfile";
 import { FiChevronDown } from "react-icons/fi";
+import { links } from "@/constants/timeSlot";
 
 export default function Profile() {
   const {
@@ -37,12 +38,10 @@ export default function Profile() {
     handleDeleteAccount,
     confirmDeleteAccount,
     cancelDeleteAccount,
-    links,
   } = useProfile();
 
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-gray-5">
-      {/* Sidebar (unchanged) */}
       <div className="w-full md:w-64 md:fixed md:h-screen border-r border-gray-200 bg-white z-10">
         <div className="hidden md:flex items-center p-4 border-b border-gray-200">
           <img src="/logo.png" alt="Calendly" className="h-10" />
@@ -87,8 +86,6 @@ export default function Profile() {
           </div>
         </div>
       </div>
-
-      {/* Main Content */}
       <div className="md:ml-64 overflow-auto p-4 md:p-8 md:pt-20 bg-gray-50 flex-1">
         <div className="max-w-3xl">
           <div className="flex flex-col mb-6">
@@ -97,7 +94,6 @@ export default function Profile() {
           </div>
 
           <div className="p-6">
-            {/* Profile Picture */}
             <div className="flex flex-col md:flex-row items-center md:items-start mb-8">
               <div className="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center mb-4 md:mb-0 md:mr-6">
                 {profilePicture ? (
@@ -129,8 +125,6 @@ export default function Profile() {
                 </p>
               </div>
             </div>
-
-            {/* Name */}
             <div className="mb-6">
               <div className="flex items-center mb-1">
                 <label
@@ -149,8 +143,6 @@ export default function Profile() {
                 className="w-full md:w-100 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
             </div>
-
-            {/* Welcome Message */}
             <div className="mb-6">
               <div className="flex items-center mb-1">
                 <label
@@ -169,8 +161,6 @@ export default function Profile() {
                 className="w-full md:w-100 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
             </div>
-
-            {/* Language */}
             <div className="mb-6">
               <label
                 htmlFor="language"
@@ -196,7 +186,6 @@ export default function Profile() {
               </div>
             </div>
 
-            {/* Date and Time Format */}
             <div className="flex flex-col md:flex-row mb-6 w-full md:w-100">
               <div className="w-full md:w-1/2 md:pr-2 mb-4 md:mb-0">
                 <div className="flex items-center mb-1">
@@ -250,8 +239,6 @@ export default function Profile() {
                 </div>
               </div>
             </div>
-
-            {/* Country */}
             <div className="mb-6">
               <label
                 htmlFor="country"
@@ -276,8 +263,6 @@ export default function Profile() {
                 </div>
               </div>
             </div>
-
-            {/* Time Zone */}
             <div className="mb-6 w-full md:w-100">
               <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-1">
                 <label
@@ -307,8 +292,6 @@ export default function Profile() {
                 </div>
               </div>
             </div>
-
-            {/* Buttons */}
             <div className="flex items-center gap-3">
               <button
                 onClick={handleSaveChanges}
@@ -327,8 +310,6 @@ export default function Profile() {
               </button>
             </div>
           </div>
-
-          {/* Delete Confirmation Popup */}
           {showDeletePopup && (
             <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
               <div className="bg-white p-6 rounded-md shadow-lg max-w-sm w-full">

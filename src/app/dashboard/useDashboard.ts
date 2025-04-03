@@ -108,7 +108,7 @@ const useDashboard = () => {
           updateAppointmentStatus({
             id: appointmentId,
             status: newStatus as "pending" | "accepted" | "rejected",
-            meetLink: updatedAppointment?.meetLink, // Update Redux with meetLink
+            meetLink: updatedAppointment?.meetLink,
           })
         );
         setIsModalOpen(false);
@@ -171,7 +171,7 @@ const useDashboard = () => {
   const allAppointments = [...appointmentsHistory, ...hostAppointments];
 
   const filteredAppointments = allAppointments.filter((appointment) => {
-    const today = new Date("2025-03-26"); // Replace with new Date() in production
+    const today = new Date("2025-03-26");
     const appointmentDate = new Date(appointment.date);
 
     switch (activeTab) {
@@ -231,48 +231,6 @@ const useDashboard = () => {
     saveAs(blob, "appointments.ics");
   };
 
-  const datePickerStyles = `
-        .react-datepicker-wrapper {
-          display: block;
-        }
-        .react-datepicker__input-container input {
-          background-color: white;
-          cursor: pointer;
-          width: 100%;
-          outline: none;
-        }
-        .react-datepicker__input-container input:hover {
-          border-color: #2563eb;
-        }
-        .react-datepicker {
-          font-family: Arial, sans-serif;
-          border: 1px solid #e5e7eb;
-          border-radius: 0.375rem;
-          background-color: #ffffff;
-          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        .react-datepicker__month-container {
-          max-height: 300px; /* Fixed height less than screen */
-          overflow-y: auto; /* Scrollable */
-        }
-        .react-datepicker__header {
-          background-color: #f9fafb;
-          border-bottom: 1px solid #e5e7eb;
-        }
-        .react-datepicker__day-name, .react-datepicker__day {
-          width: 2rem;
-          line-height: 2rem;
-          text-align: center;
-        }
-        .react-datepicker__day--selected, .react-datepicker__day--in-range {
-          background-color: #2563eb;
-          color: white;
-        }
-        .react-datepicker__day--outside-month {
-          color: #9ca3af;
-        }
-      `;
-
   return {
     activeTab,
     setActiveTab,
@@ -304,7 +262,6 @@ const useDashboard = () => {
     allAppointments,
     filteredAppointments,
     exportToICS,
-    datePickerStyles,
     sidebarOptions,
     bottomOptions,
   };

@@ -19,7 +19,6 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-// Component to sync session with Redux
 function SessionSync() {
   const { data: session, status } = useSession();
   const dispatch = useAppDispatch();

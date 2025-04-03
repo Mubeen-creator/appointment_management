@@ -1,14 +1,6 @@
 import React, { useState } from "react";
 import { PiEyeSlashBold, PiEyeBold } from "react-icons/pi";
-
-interface InputProps {
-  type?: "text" | "password" | "email";
-  placeholder: string;
-  value: string;
-  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  className?: string;
-  showPasswordToggle?: boolean; // Prop to control eye icon visibility
-}
+import { InputProps } from "@/constants/interfaces";
 
 const Input: React.FC<InputProps> = ({
   type = "text",
@@ -29,7 +21,6 @@ const Input: React.FC<InputProps> = ({
         onChange={onChange}
         className={`border border-gray-400 px-3 py-3 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-gray-700 ${className}`}
       />
-      {/* Show Eye Icon Only for Password Fields */}
       {showPasswordToggle && (
         <button
           type="button"

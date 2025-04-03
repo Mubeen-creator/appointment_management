@@ -1,8 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { RootState, useAppSelector } from "@/store/store";
-import { Appointment } from "@/store/slices/appointmentSlice";
+import React from "react";
 import {
   Copy,
   Link as LinkIcon,
@@ -10,51 +7,23 @@ import {
   Clock,
   ArrowLeft,
 } from "lucide-react";
+import useLinks from "./useLinks";
 
 const LinksPage = () => {
-  const router = useRouter();
-  const [isHovered, setIsHovered] = useState(false);
-  const [acceptedAppointments, setAcceptedAppointments] = useState<
-    Appointment[]
-  >([]);
-  const [copiedStates, setCopiedStates] = useState<{ [key: string]: boolean }>(
-    {}
-  );
-
-  const appointmentsHistory = useAppSelector(
-    (state: RootState) => state?.appointment?.appointmentsHistory
-  );
-  const hostAppointments = useAppSelector(
-    (state: RootState) => state?.appointment?.hostAppointments
-  );
-
-  useEffect(() => {
-    const allAppointments = [...appointmentsHistory, ...hostAppointments];
-    const filtered = allAppointments.filter(
-      (appt) => appt?.status === "accepted" && appt?.meetLink
-    );
-    setAcceptedAppointments(filtered);
-  }, [appointmentsHistory, hostAppointments]);
-
-  const copyToClipboard = (link: string, appointmentId: string) => {
-    navigator?.clipboard?.writeText(link);
-
-    setCopiedStates((prev) => ({
-      ...prev,
-      [appointmentId]: true,
-    }));
-
-    setTimeout(() => {
-      setCopiedStates((prev) => ({
-        ...prev,
-        [appointmentId]: false,
-      }));
-    }, 3000);
-  };
-
-  const handleGoBack = () => {
-    router.push("/profile");
-  };
+  const {
+    router,
+    isHovered,
+    setIsHovered,
+    acceptedAppointments,
+    setAcceptedAppointments,
+    copiedStates,
+    setCopiedStates,
+    appointmentsHistory,
+    hostAppointments,
+    useEffect,
+    copyToClipboard,
+    handleGoBack,
+  } = useLinks();
 
   return (
     <div className="min-h-screen bg-[#f4f6f9] px-4 py-8 sm:px-6 lg:px-8">
@@ -97,7 +66,6 @@ const LinksPage = () => {
           <h1 className="text-3xl font-bold text-gray-900 text-center flex-grow">
             Meeting Links
           </h1>
-          {/* Placeholder div to center the title */}
           <div className="w-12"></div>
         </div>
 

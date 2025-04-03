@@ -1,4 +1,3 @@
-// app/api/get-user/route.ts
 import clientPromise from "@/app/lib/mongodb";
 import { NextResponse } from "next/server";
 
@@ -22,7 +21,6 @@ export async function GET(request: Request) {
       return NextResponse.json({ message: "User not found" }, { status: 404 });
     }
 
-    // Exclude password from the response
     const { password, ...userData } = user;
     return NextResponse.json(userData, { status: 200 });
   } catch (error) {

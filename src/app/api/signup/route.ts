@@ -9,7 +9,6 @@ export async function POST(request: Request) {
     const client = await clientPromise;
     const db = client?.db("appointmentManagement");
 
-    // Check if user already exists
     const existingUser = await db?.collection("users").findOne({ email });
     if (existingUser) {
       return NextResponse.json(
@@ -18,15 +17,13 @@ export async function POST(request: Request) {
       );
     }
 
-    // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Save user to MongoDB
     await db?.collection("users")?.insertOne({
       email,
       fullName,
       userName,
-      password: hashedPassword, // Store hashed password
+      password: hashedPassword,
     });
 
     return NextResponse.json(

@@ -1,19 +1,6 @@
 import React from "react";
-
-const days = [
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday",
-  "Sunday",
-];
-
-interface AvailableDaysProps {
-  selectedDays: string[];
-  setSelectedDays: React.Dispatch<React.SetStateAction<string[]>>;
-}
+import { days } from "@/constants/timeSlot";
+import { AvailableDaysProps } from "@/constants/interfaces";
 
 const AvailableDays: React.FC<AvailableDaysProps> = ({
   selectedDays,
@@ -31,7 +18,6 @@ const AvailableDays: React.FC<AvailableDaysProps> = ({
     <div className="mt-6 md:mt-10 px-3 md:px-5">
       <h1 className="font-bold text-black mb-2">Available Days</h1>
       <div className="border border-gray-300 w-full rounded-sm overflow-hidden">
-        {/* Mobile view - Stack vertically */}
         <div className="flex flex-col md:hidden">
           {days?.map((day, index) => (
             <div
@@ -57,8 +43,6 @@ const AvailableDays: React.FC<AvailableDaysProps> = ({
             </div>
           ))}
         </div>
-
-        {/* Desktop view - Side by side */}
         <div className="hidden md:flex justify-between items-center">
           {days.map((day, index) => (
             <div

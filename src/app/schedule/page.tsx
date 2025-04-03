@@ -7,6 +7,7 @@ import { HiOutlineClock } from "react-icons/hi";
 import Header from "@/components/header/Header";
 import Button from "@/components/button/Button";
 import useSchedule from "./useSchedule";
+import { weekdays } from "@/constants/timeSlot";
 
 export default function MeetingScheduler() {
   const {
@@ -37,7 +38,6 @@ export default function MeetingScheduler() {
       <Header />
       <div className="min-h-screen flex items-center justify-center p-4 bg-gray-100">
         <div className="bg-white rounded-lg shadow-lg max-w-4xl w-full flex flex-col md:flex-row p-4 md:p-6">
-          {/* Left Section: User Info */}
           <div className="w-full md:w-1/3 flex flex-col md:pr-6 mb-4 md:mb-0">
             <h1 className="font-semibold text-gray-500">{user?.userName}</h1>
             <span className="text-black font-bold text-xl md:text-2xl">
@@ -52,16 +52,9 @@ export default function MeetingScheduler() {
               </div>
             </div>
           </div>
-
-          {/* Vertical Divider - Hidden on mobile */}
           <div className="hidden md:block w-[1px] bg-gray-300"></div>
-
-          {/* Horizontal Divider - Shown only on mobile */}
           <hr className="border-t border-gray-300 w-full my-4 md:hidden" />
-
-          {/* Right Section: Calendar & Time Selection */}
           <div className="w-full md:w-2/3 flex flex-col md:flex-row md:pl-5">
-            {/* Calendar Section */}
             <div className="w-full md:w-2/3 md:pr-6 flex flex-col mb-6 md:mb-0">
               <h2 className="text-lg font-semibold text-gray-700">
                 Select a Date & Time
@@ -81,17 +74,11 @@ export default function MeetingScheduler() {
                   <ChevronRightIcon className="h-8 w-8 text-blue-500 bg-blue-200 p-2 rounded-full cursor-pointer" />
                 </button>
               </div>
-
-              {/* Calendar Grid */}
               <div className="mt-4">
                 <div className="grid grid-cols-7 gap-1 text-center text-xs md:text-sm text-gray-500">
-                  <div>Mon</div>
-                  <div>Tue</div>
-                  <div>Wed</div>
-                  <div>Thu</div>
-                  <div>Fri</div>
-                  <div>Sat</div>
-                  <div>Sun</div>
+                  {weekdays?.map((day, index) => (
+                    <div key={index}>{day}</div>
+                  ))}
                 </div>
                 <div className="grid grid-cols-7 gap-1 mt-2 text-center">
                   {Array?.from({ length: firstDayOfMonth })?.map((_, i) => (
@@ -119,8 +106,6 @@ export default function MeetingScheduler() {
                   })}
                 </div>
               </div>
-
-              {/* Timezone Selector (Below Calendar) */}
               <div className="mt-4 md:mt-6 flex flex-col">
                 <p className="text-sm text-gray-600">Time zone:</p>
                 <div className="mt-2">
@@ -140,8 +125,6 @@ export default function MeetingScheduler() {
                 </div>
               </div>
             </div>
-
-            {/* Time Selection Section */}
             <div className="w-full md:w-1/3 flex flex-col items-center">
               <p className="text-sm text-gray-500 mb-4 cursor-pointer">
                 {selectedDate?.toLocaleDateString("en-US", {

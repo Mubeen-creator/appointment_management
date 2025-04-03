@@ -16,8 +16,6 @@ const useProfile = () => {
   const user = useAppSelector((state: RootState) => state.user);
   const dispatch = useAppDispatch();
   const router = useRouter();
-
-  // Form state
   const [name, setName] = useState("");
   const [welcomeMessage, setWelcomeMessage] = useState("");
   const [language, setLanguage] = useState("English");
@@ -29,10 +27,8 @@ const useProfile = () => {
     user?.profilePicture || null
   );
   const [loading, setLoading] = useState(true);
-  // State for delete confirmation popup
   const [showDeletePopup, setShowDeletePopup] = useState(false);
 
-  // Initialize form state from Redux
   useEffect(() => {
     if (user?.userName) setName(user?.userName);
     if (user?.welcomeMessage) setWelcomeMessage(user?.welcomeMessage);
@@ -44,7 +40,6 @@ const useProfile = () => {
     router.push("/");
   };
 
-  // Fetch user data
   useEffect(() => {
     const fetchUserData = async () => {
       if (!user.email) return;
@@ -139,7 +134,7 @@ const useProfile = () => {
   };
 
   const handleDeleteAccount = () => {
-    setShowDeletePopup(true); // Show confirmation popup
+    setShowDeletePopup(true);
   };
 
   const confirmDeleteAccount = async () => {
@@ -165,17 +160,8 @@ const useProfile = () => {
   };
 
   const cancelDeleteAccount = () => {
-    setShowDeletePopup(false); // Hide popup
+    setShowDeletePopup(false);
   };
-
-  const links = [
-    { href: "/profile", icon: FiUser, label: "Profile", active: true },
-    { href: "", icon: FiPenTool, label: "Branding" },
-    { href: "/links", icon: FiLink, label: "My Link" },
-    { href: "", icon: FiLock, label: "Login preferences" },
-    { href: "", icon: FiSettings, label: "Cookie settings" },
-    { href: "", icon: FiCalendar, label: "Calendar sync" },
-  ];
 
   return {
     user,
@@ -203,7 +189,6 @@ const useProfile = () => {
     handleDeleteAccount,
     confirmDeleteAccount,
     cancelDeleteAccount,
-    links,
   };
 };
 

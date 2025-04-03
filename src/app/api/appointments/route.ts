@@ -1,8 +1,6 @@
-// app/api/appointments/route.ts
 import clientPromise from "@/app/lib/mongodb";
 import { NextResponse } from "next/server";
 
-// POST: Create a new appointment
 export async function POST(request: Request) {
   console.log(
     "\n\n[API] /api/appointments triggered at",
@@ -13,7 +11,6 @@ export async function POST(request: Request) {
     const payload = await request.json();
     console.log("[API] Appointment payload:", payload);
 
-    // Validate required fields
     const requiredFields = ["requesterEmail", "hostEmail", "date", "time"];
     const missingFields = requiredFields?.filter((field) => !payload[field]);
 
@@ -56,12 +53,11 @@ export async function POST(request: Request) {
   }
 }
 
-// GET: Fetch appointments for a specific user
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const email = searchParams?.get("email"); // Get the user's email from query params
-    const hostEmail = searchParams?.get("hostEmail"); // Get the host's email from query params
+    const email = searchParams?.get("email");
+    const hostEmail = searchParams?.get("hostEmail");
 
     if (!email && !hostEmail) {
       return NextResponse.json(
@@ -75,9 +71,9 @@ export async function GET(request: Request) {
 
     let query = {};
     if (email) {
-      query = { requesterEmail: email }; // Fetch appointments where the user is the requester
+      query = { requesterEmail: email };
     } else if (hostEmail) {
-      query = { hostEmail: hostEmail }; // Fetch appointments where the user is the host
+      query = { hostEmail: hostEmail };
     }
 
     const appointments = await db

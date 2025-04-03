@@ -4,6 +4,7 @@ import { useState, useMemo } from "react";
 import { setAppointment } from "@/store/slices/appointmentSlice";
 import { useRouter } from "next/navigation";
 import { RootState, useAppDispatch, useAppSelector } from "@/store/store";
+import { timeSlots } from "@/constants/timeSlot";
 const useSchedule = () => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
@@ -15,18 +16,6 @@ const useSchedule = () => {
   const dispatch = useAppDispatch();
   const router = useRouter();
   const user = useAppSelector((state: RootState) => state?.user);
-
-  const timeSlots = [
-    "9:00am",
-    "9:30am",
-    "10:00am",
-    "10:30am",
-    "11:00am",
-    "11:30am",
-    "12:00pm",
-    "12:30pm",
-    "1:00pm",
-  ];
 
   const daysInMonth = useMemo(() => {
     const year = currentMonth?.getFullYear();
@@ -72,7 +61,7 @@ const useSchedule = () => {
 
   const handleSchedule = () => {
     if (selectedDate && selectedTime) {
-      const dateString = selectedDate?.toISOString()?.split("T")[0]; // Format: YYYY-MM-DD
+      const dateString = selectedDate?.toISOString()?.split("T")[0];
       dispatch(
         setAppointment({
           date: dateString,

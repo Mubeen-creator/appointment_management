@@ -12,7 +12,7 @@ export interface Appointment {
   timeZone?: string;
   createdAt?: string;
   updatedAt?: string;
-  meetLink?: string; // Add meetLink field
+  meetLink?: string;
 }
 
 interface AppointmentState {
@@ -30,7 +30,7 @@ const initialState: AppointmentState = {
     message: "",
     status: "pending",
     tag: undefined,
-    meetLink: undefined, // Initialize meetLink
+    meetLink: undefined,
   },
   appointmentsHistory: [],
   hostAppointments: [],
@@ -70,7 +70,7 @@ const appointmentSlice = createSlice({
       action: PayloadAction<{
         id: string;
         status: "pending" | "accepted" | "rejected";
-        meetLink?: string; // Add meetLink to update
+        meetLink?: string;
       }>
     ) => {
       const { id, status, meetLink } = action?.payload;

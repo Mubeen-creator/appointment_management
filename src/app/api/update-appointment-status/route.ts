@@ -3,7 +3,6 @@ import { NextResponse } from "next/server";
 import { ObjectId } from "mongodb";
 import nodemailer from "nodemailer";
 
-// Simulated Google Meet link generator (replace with actual Google API integration)
 const generateGoogleMeetLink = () => {
   return `https://meet.google.com/abc-${Math.random()
     .toString(36)
@@ -64,7 +63,6 @@ export async function POST(request: Request) {
       );
     }
 
-    // Generate Google Meet link if status is "accepted"
     const updateData: any = {
       status,
       updatedAt: new Date(),
@@ -94,7 +92,6 @@ export async function POST(request: Request) {
     const updatedDoc = result.value;
     console.log("[API] Appointment updated successfully:", updatedDoc);
 
-    // Send email notification if status changed
     if (status !== "pending" && requesterEmail) {
       const transporter = nodemailer.createTransport({
         service: "gmail",
@@ -128,7 +125,6 @@ export async function POST(request: Request) {
         text: emailContent,
       };
 
-      // Send email to host as well if accepted
       if (status === "accepted" && meetLink) {
         const hostMailOptions = {
           ...mailOptions,

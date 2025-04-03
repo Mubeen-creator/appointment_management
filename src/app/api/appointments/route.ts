@@ -2,15 +2,9 @@ import clientPromise from "@/app/lib/mongodb";
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
-  console.log(
-    "\n\n[API] /api/appointments triggered at",
-    new Date()?.toISOString()
-  );
 
   try {
     const payload = await request.json();
-    console.log("[API] Appointment payload:", payload);
-
     const requiredFields = ["requesterEmail", "hostEmail", "date", "time"];
     const missingFields = requiredFields?.filter((field) => !payload[field]);
 
@@ -32,10 +26,7 @@ export async function POST(request: Request) {
       updatedAt: new Date(),
     };
 
-    console.log("[API] Inserting appointment:", appointment);
-
     const result = await db.collection("appointments").insertOne(appointment);
-    console.log("[API] Insert result:", result);
 
     return NextResponse.json(
       {

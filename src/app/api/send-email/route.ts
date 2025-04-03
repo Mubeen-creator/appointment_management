@@ -45,7 +45,6 @@ export async function POST(req: Request) {
     };
 
     const info = await transporter.sendMail(mailOptions);
-    console.log("[Backend] Email sent successfully:", info.response);
 
     return new NextResponse(
       JSON.stringify({ message: "Email sent successfully!" }),

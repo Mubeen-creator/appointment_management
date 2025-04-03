@@ -35,8 +35,6 @@ const useAvailibilityHours = () => {
       return;
     }
 
-    console.log("User from Redux store:", user);
-
     if (!user.email) {
       alert("User email is missing. Please sign in again.");
       router.push("/");

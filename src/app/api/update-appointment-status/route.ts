@@ -10,19 +10,12 @@ const generateGoogleMeetLink = () => {
 };
 
 export async function POST(request: Request) {
-  console.log(
-    "[API] POST /api/update-appointment-status triggered at",
-    new Date().toISOString()
-  );
-
   try {
     const payload = await request.json();
-    console.log("[API] Received payload:", payload);
 
     const { appointmentId, status, requesterEmail } = payload;
 
     if (!appointmentId || !status) {
-      console.log("[API] Missing required fields:", { appointmentId, status });
       return NextResponse.json(
         { message: "Missing required fields: appointmentId and status" },
         { status: 400 }
@@ -31,7 +24,6 @@ export async function POST(request: Request) {
 
     const validStatuses = ["pending", "accepted", "rejected"];
     if (!validStatuses.includes(status)) {
-      console.log("[API] Invalid status value:", status);
       return NextResponse.json(
         { message: "Invalid status value" },
         { status: 400 }
@@ -45,7 +37,6 @@ export async function POST(request: Request) {
     try {
       objectId = new ObjectId(appointmentId);
     } catch (error) {
-      console.log("[API] Invalid ObjectId format:", appointmentId);
       return NextResponse.json(
         { message: "Invalid appointment ID format" },
         { status: 400 }
@@ -56,7 +47,6 @@ export async function POST(request: Request) {
       .collection("appointments")
       .findOne({ _id: objectId });
     if (!existingDoc) {
-      console.log("[API] No document found for ID:", appointmentId);
       return NextResponse.json(
         { message: "Appointment not found" },
         { status: 404 }
@@ -82,7 +72,6 @@ export async function POST(request: Request) {
       );
 
     if (!result || !result.value) {
-      console.log("[API] Update operation failed for ID:", appointmentId);
       return NextResponse.json(
         { message: "Failed to update appointment" },
         { status: 500 }
@@ -90,7 +79,6 @@ export async function POST(request: Request) {
     }
 
     const updatedDoc = result.value;
-    console.log("[API] Appointment updated successfully:", updatedDoc);
 
     if (status !== "pending" && requesterEmail) {
       const transporter = nodemailer.createTransport({
@@ -144,10 +132,8 @@ export async function POST(request: Request) {
         await transporter?.sendMail(hostMailOptions);
       }
 
-      console.log("[API] Sending email notification to:", requesterEmail);
       try {
         const info = await transporter.sendMail(mailOptions);
-        console.log("[API] Email sent successfully:", info?.response);
       } catch (emailError) {
         console.error("[API] Email sending failed:", emailError);
       }

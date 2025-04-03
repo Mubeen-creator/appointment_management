@@ -53,7 +53,6 @@ const useConfirm = () => {
         },
       };
 
-      console.log("[Frontend] Sending email request:", emailPayload);
       const emailResponse = await axios.post("/api/send-email", emailPayload);
 
       if (emailResponse.status !== 200) {

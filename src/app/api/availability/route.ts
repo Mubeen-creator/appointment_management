@@ -5,13 +5,6 @@ export async function POST(request: Request) {
   try {
     const { email, startTime, endTime, availableDays } = await request.json();
 
-    console.log("Request body received in API:", {
-      email,
-      startTime,
-      endTime,
-      availableDays,
-    });
-
     const missingFields = [];
     if (!email) missingFields?.push("email");
     if (!startTime) missingFields?.push("startTime");

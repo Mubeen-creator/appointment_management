@@ -7,6 +7,7 @@ import Image from "next/image";
 import React from "react";
 import { GrAnnounce } from "react-icons/gr";
 import useAvailibilityHours from "./useAvailibilityHours";
+import Loader from "@/components/loader/Loader";
 
 const Page = () => {
   const {
@@ -16,6 +17,7 @@ const Page = () => {
     setEndTime,
     selectedDays,
     setSelectedDays,
+    isLoading,
     user,
     dispatch,
     router,
@@ -28,6 +30,7 @@ const Page = () => {
 
   return (
     <div className="flex flex-col items-center justify-center my-5 px-4">
+      {isLoading && <Loader />}
       <div>
         <Image
           src="/logo.png"
@@ -37,7 +40,6 @@ const Page = () => {
           className="object-contain"
         />
       </div>
-
       <div
         ref={containerRef}
         className="border border-gray-300 py-5 mt-5 flex flex-col w-full max-w-3xl"
@@ -72,18 +74,21 @@ const Page = () => {
             value={startTime}
             onChange={(e) => setStartTime(e?.target?.value)}
             className="w-full md:w-auto"
+            disabled={isLoading}
           />
           <Dropdown
             end
             value={endTime}
             onChange={(e) => setEndTime(e?.target?.value)}
             className="w-full md:w-auto mt-3 md:mt-0"
+            disabled={isLoading}
           />
         </div>
 
         <AvailableDays
           selectedDays={selectedDays}
           setSelectedDays={setSelectedDays}
+          disabled={isLoading}
         />
 
         <div className="mt-5 flex flex-col md:flex-row items-center justify-center gap-y-2 md:gap-y-0 md:gap-x-3 px-4 text-center md:text-left">
@@ -94,7 +99,6 @@ const Page = () => {
           </p>
         </div>
       </div>
-
       <div className="mt-5 flex flex-col md:flex-row items-center justify-center md:justify-evenly w-full gap-4 md:gap-0">
         <Image
           src="/Progressbar.png"
@@ -107,6 +111,7 @@ const Page = () => {
           <button
             className="pr-4 cursor-pointer text-sm md:text-base"
             onClick={() => router?.push("/schedule")}
+            disabled={isLoading}
           >
             Set up later
           </button>
@@ -114,6 +119,7 @@ const Page = () => {
             text="Continue"
             className="w-[130px]"
             onClick={handleContinue}
+            disabled={isLoading}
           />
         </div>
       </div>

@@ -9,6 +9,7 @@ const Input: React.FC<InputProps> = ({
   onChange,
   className = "",
   showPasswordToggle = false,
+  disabled = false,
 }) => {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 

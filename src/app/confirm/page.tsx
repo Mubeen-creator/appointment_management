@@ -6,6 +6,7 @@ import { BiBaseball } from "react-icons/bi";
 import { CiCalendar } from "react-icons/ci";
 import { HiOutlineClock } from "react-icons/hi";
 import useConfirm from "./useConfirm";
+import Loader from "@/components/loader/Loader";
 
 export default function ConfirmMeeting() {
   const {
@@ -15,6 +16,7 @@ export default function ConfirmMeeting() {
     setEmail,
     notes,
     setNotes,
+    isLoading,
     user,
     router,
     dispatch,
@@ -25,12 +27,14 @@ export default function ConfirmMeeting() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
+      {isLoading && <Loader />}
       <div className="bg-white rounded-lg shadow-lg w-full max-w-3xl p-4 md:p-8 relative">
         <div className="flex flex-col md:flex-row">
           <div className="w-full md:w-1/3 md:pr-6 mb-6 md:mb-0">
             <button
               className="mb-4 text-blue-500 border p-2 border-gray-300 rounded-full cursor-pointer"
               onClick={() => router?.push("/schedule")}
+              disabled={isLoading}
             >
               <ArrowLeftIcon className="h-5 w-5" />
             </button>
@@ -88,6 +92,7 @@ export default function ConfirmMeeting() {
                   placeholder=""
                   value={name}
                   onChange={(e) => setName(e?.target?.value)}
+                  disabled={isLoading}
                 />
               </div>
               <div>
@@ -102,6 +107,7 @@ export default function ConfirmMeeting() {
                   placeholder=""
                   value={email}
                   onChange={(e) => setEmail(e?.target?.value)}
+                  disabled={isLoading}
                 />
               </div>
               <div>
@@ -116,10 +122,9 @@ export default function ConfirmMeeting() {
                   value={notes}
                   onChange={(e) => setNotes(e?.target?.value)}
                   className="border border-gray-400 px-3 py-3 rounded-md w-full md:w-[88%] focus:outline-none focus:ring-2 focus:ring-gray-700 mt-2"
+                  disabled={isLoading}
                 />
               </div>
-
-              {/* Terms and Button */}
               <div className="text-xs md:text-sm text-gray-500">
                 By proceeding, you confirm that you have read and agree to{" "}
                 <br className="hidden md:block" />
@@ -143,6 +148,7 @@ export default function ConfirmMeeting() {
                   text="Schedule Event"
                   className="w-full md:w-[170px]"
                   onClick={handleConfirm}
+                  disabled={isLoading}
                 />
               </div>
             </form>

@@ -5,13 +5,14 @@ import { useRouter } from "next/navigation";
 import { RootState, useAppDispatch, useAppSelector } from "@/store/store";
 import { addAppointmentToHistory } from "@/store/slices/appointmentSlice";
 import axios from "axios";
+
 const useConfirm = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [notes, setNotes] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const user = useAppSelector((state: RootState) => state.user);
-
   const router = useRouter();
   const dispatch = useAppDispatch();
 
@@ -21,6 +22,7 @@ const useConfirm = () => {
 
   const handleConfirm = async () => {
     event?.preventDefault();
+    setIsLoading(true);
     try {
       if (!user?.email || !email || !date || !time || !name) {
         alert("Please fill all required fields");
@@ -61,10 +63,12 @@ const useConfirm = () => {
       }
 
       dispatch(addAppointmentToHistory());
-      router.push("/meeting-confirmation");
+      await router.push("/meeting-confirmation");
     } catch (error) {
       console.error("Error:", error);
       alert("An unexpected error occurred.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -75,6 +79,7 @@ const useConfirm = () => {
     setEmail,
     notes,
     setNotes,
+    isLoading,
     user,
     router,
     dispatch,

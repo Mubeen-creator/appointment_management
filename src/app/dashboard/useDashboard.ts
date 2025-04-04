@@ -23,6 +23,7 @@ const useDashboard = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const dispatch = useAppDispatch();
   const user = useAppSelector((state: RootState) => state?.user);
@@ -36,7 +37,9 @@ const useDashboard = () => {
   const profileRoute = "/profile";
 
   const handleNavigation = () => {
+    setIsLoading(true);
     router.push(profileRoute);
+    setTimeout(() => setIsLoading(false), 500);
   };
 
   const sidebarOptions = [
@@ -51,6 +54,7 @@ const useDashboard = () => {
 
   useEffect(() => {
     const fetchAppointments = async () => {
+      setIsLoading(true);
       try {
         const response = await fetch(`/api/appointments?email=${user?.email}`);
         const data = await response?.json();
@@ -63,6 +67,8 @@ const useDashboard = () => {
         dispatch(setHostAppointments(hostData));
       } catch (error) {
         console.error("Error fetching appointments:", error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -75,6 +81,7 @@ const useDashboard = () => {
     appointmentId: string,
     newStatus: string
   ) => {
+    setIsLoading(true);
     try {
       if (!selectedAppointment) return;
 
@@ -115,6 +122,8 @@ const useDashboard = () => {
       }
     } catch (error) {
       console.error("Error updating appointment status:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -190,45 +199,54 @@ const useDashboard = () => {
   });
 
   const exportToICS = () => {
-    const icsContent = [
-      "BEGIN:VCALENDAR",
-      "VERSION:2.0",
-      "PRODID:-//xAI//Grok 3//EN",
-      ...filteredAppointments.map((appointment) => {
-        const startDateTime = parse(
-          `${appointment?.date} ${appointment?.time}`,
-          "yyyy-MM-dd h:mma",
-          new Date()
-        );
-        const endDateTime = new Date(startDateTime.getTime() + 30 * 60 * 1000);
+    setIsLoading(true); // Show loader
+    try {
+      const icsContent = [
+        "BEGIN:VCALENDAR",
+        "VERSION:2.0",
+        "PRODID:-//xAI//Grok 3//EN",
+        ...filteredAppointments.map((appointment) => {
+          const startDateTime = parse(
+            `${appointment?.date} ${appointment?.time}`,
+            "yyyy-MM-dd h:mma",
+            new Date()
+          );
+          const endDateTime = new Date(
+            startDateTime.getTime() + 30 * 60 * 1000
+          );
 
-        const formatICSDate = (date: Date) =>
-          format(date, "yyyyMMdd'T'HHmmss'Z'");
+          const formatICSDate = (date: Date) =>
+            format(date, "yyyyMMdd'T'HHmmss'Z'");
 
-        return [
-          "BEGIN:VEVENT",
-          `UID:${appointment._id}`,
-          `DTSTART:${formatICSDate(startDateTime)}`,
-          `DTEND:${formatICSDate(endDateTime)}`,
-          `SUMMARY:Meeting with ${
-            appointment?.tag === "Sent"
-              ? appointment?.hostEmail
-              : appointment?.requesterEmail
-          }`,
-          `DESCRIPTION:${appointment?.message || "No message"}`,
-          `ORGANIZER;CN=${appointment?.hostEmail}:mailto:${appointment?.hostEmail}`,
-          `ATTENDEE;CN=${appointment?.requesterEmail}:mailto:${appointment?.requesterEmail}`,
-          "STATUS:CONFIRMED",
-          "END:VEVENT",
-        ].join("\r\n");
-      }),
-      "END:VCALENDAR",
-    ].join("\r\n");
+          return [
+            "BEGIN:VEVENT",
+            `UID:${appointment._id}`,
+            `DTSTART:${formatICSDate(startDateTime)}`,
+            `DTEND:${formatICSDate(endDateTime)}`,
+            `SUMMARY:Meeting with ${
+              appointment?.tag === "Sent"
+                ? appointment?.hostEmail
+                : appointment?.requesterEmail
+            }`,
+            `DESCRIPTION:${appointment?.message || "No message"}`,
+            `ORGANIZER;CN=${appointment?.hostEmail}:mailto:${appointment?.hostEmail}`,
+            `ATTENDEE;CN=${appointment?.requesterEmail}:mailto:${appointment?.requesterEmail}`,
+            "STATUS:CONFIRMED",
+            "END:VEVENT",
+          ].join("\r\n");
+        }),
+        "END:VCALENDAR",
+      ].join("\r\n");
 
-    const blob = new Blob([icsContent], {
-      type: "text/calendar;charset=utf-8",
-    });
-    saveAs(blob, "appointments.ics");
+      const blob = new Blob([icsContent], {
+        type: "text/calendar;charset=utf-8",
+      });
+      saveAs(blob, "appointments.ics");
+    } catch (error) {
+      console.error("Error exporting to ICS:", error);
+    } finally {
+      setIsLoading(false); // Hide loader
+    }
   };
 
   return {
@@ -246,6 +264,7 @@ const useDashboard = () => {
     setStartDate,
     endDate,
     setEndDate,
+    isLoading, // Export loading state
     dispatch,
     user,
     appointmentsHistory,

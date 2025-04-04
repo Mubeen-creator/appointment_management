@@ -11,6 +11,7 @@ export interface DropdownProps {
   start?: boolean;
   end?: boolean;
   className?: string;
+  disabled?: boolean;
 }
 
 export interface InputProps {
@@ -20,9 +21,19 @@ export interface InputProps {
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   className?: string;
   showPasswordToggle?: boolean;
+  disabled?: boolean;
 }
 
 export interface AvailableDaysProps {
   selectedDays: string[];
   setSelectedDays: React.Dispatch<React.SetStateAction<string[]>>;
+}
+
+export interface LoaderProps {
+  size?: "sm" | "md" | "lg";
+  theme?: "neon" | "hologram" | "cyber" | "quantum";
+  loadingText?: string;
+  showText?: boolean;
+  showProgress?: boolean;
+  progressValue?: number;
 }

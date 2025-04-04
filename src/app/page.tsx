@@ -4,6 +4,7 @@ import Input from "@/components/input/Input";
 import Button from "@/components/button/Button";
 import Image from "next/image";
 import useHomePage from "@/constants/useHomePage";
+import Loader from "@/components/loader/Loader";
 
 export default function Home() {
   const {
@@ -17,6 +18,7 @@ export default function Home() {
     setPassword,
     isSignUp,
     setIsSignUp,
+    isLoading,
     session,
     handleSignUp,
     handleSignIn,
@@ -25,6 +27,7 @@ export default function Home() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4">
+      {isLoading && <Loader />}
       <div className="flex flex-col items-center justify-center mb-6">
         <Image
           src="/logo.png"
@@ -38,7 +41,6 @@ export default function Home() {
           <span>free</span>
         </h1>
       </div>
-
       <div className="border border-gray-300 px-10 py-8 shadow-md rounded-lg w-full max-w-lg h-auto flex flex-col items-center justify-center">
         <div className="w-full">
           <label className="text-md font-semibold text-black mb-1 block">
@@ -49,6 +51,7 @@ export default function Home() {
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e?.target?.value)}
+            disabled={isLoading}
           />
         </div>
 
@@ -63,6 +66,7 @@ export default function Home() {
                 placeholder="Full Name"
                 value={fullName}
                 onChange={(e) => setFullName(e?.target?.value)}
+                disabled={isLoading}
               />
             </div>
             <div className="w-full mt-4">
@@ -74,6 +78,7 @@ export default function Home() {
                 placeholder="Username"
                 value={userName}
                 onChange={(e) => setUserName(e?.target?.value)}
+                disabled={isLoading}
               />
             </div>
           </>
@@ -91,6 +96,7 @@ export default function Home() {
             value={password}
             onChange={(e) => setPassword(e?.target?.value)}
             showPasswordToggle={true}
+            disabled={isLoading}
           />
         </div>
 
@@ -115,6 +121,7 @@ export default function Home() {
           text={isSignUp ? "Sign Up" : "Sign In"}
           className="mt-6 w-[130px]"
           onClick={isSignUp ? handleSignUp : handleSignIn}
+          disabled={isLoading}
         />
 
         {session && (
@@ -122,6 +129,7 @@ export default function Home() {
             text="Sign Out"
             className="mt-4 w-[130px] bg-red-500"
             onClick={handleSignOut}
+            disabled={isLoading}
           />
         )}
 

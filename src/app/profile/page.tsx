@@ -10,6 +10,7 @@ import Link from "next/link";
 import useProfile from "./useProfile";
 import { FiChevronDown } from "react-icons/fi";
 import { links } from "@/constants/timeSlot";
+import Loader from "@/components/loader/Loader";
 
 export default function Profile() {
   const {
@@ -29,6 +30,7 @@ export default function Profile() {
     timeZone,
     setTimeZone,
     loading,
+    isLoading,
     profilePicture,
     setProfilePicture,
     showDeletePopup,
@@ -42,6 +44,7 @@ export default function Profile() {
 
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-gray-5">
+      {isLoading && <Loader />}
       <div className="w-full md:w-64 md:fixed md:h-screen border-r border-gray-200 bg-white z-10">
         <div className="hidden md:flex items-center p-4 border-b border-gray-200">
           <img src="/logo.png" alt="Calendly" className="h-10" />
@@ -52,7 +55,7 @@ export default function Profile() {
             className="flex items-center text-blue-600 mb-6"
           >
             <FiChevronLeft size={16} className="mr-2" />
-            <span className="text-sm">Back to home</span>
+            <span className="text Wagen sm">Back to home</span>
           </Link>
           <h2 className="text-lg font-medium mb-4">Account settings</h2>
           <nav className="space-y-1">
@@ -113,10 +116,13 @@ export default function Profile() {
                   accept="image/*"
                   style={{ display: "none" }}
                   onChange={handlePictureUpload}
+                  disabled={isLoading}
                 />
                 <label
                   htmlFor="profilePictureInput"
-                  className="px-4 py-2 border border-gray-300 rounded-full text-sm cursor-pointer"
+                  className={`px-4 py-2 border border-gray-300 rounded-full text-sm cursor-pointer ${
+                    isLoading ? "opacity-50 cursor-not-allowed" : ""
+                  }`}
                 >
                   Upload picture
                 </label>
@@ -141,6 +147,7 @@ export default function Profile() {
                 value={name}
                 onChange={(e) => setName(e?.target?.value)}
                 className="w-full md:w-100 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                disabled={isLoading}
               />
             </div>
             <div className="mb-6">
@@ -159,6 +166,7 @@ export default function Profile() {
                 onChange={(e) => setWelcomeMessage(e?.target?.value)}
                 rows={4}
                 className="w-full md:w-100 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                disabled={isLoading}
               />
             </div>
             <div className="mb-6">
@@ -174,6 +182,7 @@ export default function Profile() {
                   value={language}
                   onChange={(e) => setLanguage(e?.target?.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md appearance-none focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  disabled={isLoading}
                 >
                   <option>English</option>
                   <option>French</option>
@@ -203,6 +212,7 @@ export default function Profile() {
                     value={dateFormat}
                     onChange={(e) => setDateFormat(e?.target?.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md appearance-none focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    disabled={isLoading}
                   >
                     <option>DD/MM/YYYY</option>
                     <option>MM/DD/YYYY</option>
@@ -229,6 +239,7 @@ export default function Profile() {
                     value={timeFormat}
                     onChange={(e) => setTimeFormat(e?.target?.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md appearance-none focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    disabled={isLoading}
                   >
                     <option>12h (am/pm)</option>
                     <option>24h</option>
@@ -252,6 +263,7 @@ export default function Profile() {
                   value={country}
                   onChange={(e) => setCountry(e?.target?.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md appearance-none focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  disabled={isLoading}
                 >
                   <option>Pakistan</option>
                   <option>United States</option>
@@ -281,6 +293,7 @@ export default function Profile() {
                   value={timeZone}
                   onChange={(e) => setTimeZone(e?.target?.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md appearance-none focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  disabled={isLoading}
                 >
                   <option>Pakistan, Mulkisan Time</option>
                   <option>GMT, Greenwich Mean Time</option>
@@ -295,16 +308,27 @@ export default function Profile() {
             <div className="flex items-center gap-3">
               <button
                 onClick={handleSaveChanges}
-                className="bg-blue-600 text-white px-4 py-2 rounded-full hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+                className={`bg-blue-600 text-white px-4 py-2 rounded-full hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 ${
+                  isLoading ? "opacity-50 cursor-not-allowed" : ""
+                }`}
+                disabled={isLoading}
               >
                 Save Changes
               </button>
-              <button className="border border-gray-300 text-gray-700 px-4 py-2 rounded-full hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50">
+              <button
+                className={`border border-gray-300 text-gray-700 px-4 py-2 rounded-full hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 ${
+                  isLoading ? "opacity-50 cursor-not-allowed" : ""
+                }`}
+                disabled={isLoading}
+              >
                 Cancel
               </button>
               <button
                 onClick={handleDeleteAccount}
-                className="bg-red-700 cursor-pointer text-white px-4 py-2 rounded-full hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 md:ml-[180px] ml-10"
+                className={`bg-red-700 cursor-pointer text-white px-4 py-2 rounded-full hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 md:ml-[180px] ml-10 ${
+                  isLoading ? "opacity-50 cursor-not-allowed" : ""
+                }`}
+                disabled={isLoading}
               >
                 Delete Account
               </button>
@@ -323,13 +347,19 @@ export default function Profile() {
                 <div className="flex justify-end gap-3">
                   <button
                     onClick={cancelDeleteAccount}
-                    className="border border-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-100 focus:outline-none"
+                    className={`border border-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-100 focus:outline-none ${
+                      isLoading ? "opacity-50 cursor-not-allowed" : ""
+                    }`}
+                    disabled={isLoading}
                   >
                     Cancel
                   </button>
                   <button
                     onClick={confirmDeleteAccount}
-                    className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 focus:outline-none"
+                    className={`bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 focus:outline-none ${
+                      isLoading ? "opacity-50 cursor-not-allowed" : ""
+                    }`}
+                    disabled={isLoading}
                   >
                     Delete
                   </button>

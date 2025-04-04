@@ -8,6 +8,7 @@ import Header from "@/components/header/Header";
 import Button from "@/components/button/Button";
 import useSchedule from "./useSchedule";
 import { weekdays } from "@/constants/timeSlot";
+import Loader from "@/components/loader/Loader";
 
 export default function MeetingScheduler() {
   const {
@@ -19,6 +20,7 @@ export default function MeetingScheduler() {
     setSelectedTime,
     selectedTimezone,
     setSelectedTimezone,
+    isLoading,
     dispatch,
     router,
     user,
@@ -37,6 +39,7 @@ export default function MeetingScheduler() {
     <>
       <Header />
       <div className="min-h-screen flex items-center justify-center p-4 bg-gray-100">
+        {isLoading && <Loader />}
         <div className="bg-white rounded-lg shadow-lg max-w-4xl w-full flex flex-col md:flex-row p-4 md:p-6">
           <div className="w-full md:w-1/3 flex flex-col md:pr-6 mb-4 md:mb-0">
             <h1 className="font-semibold text-gray-500">{user?.userName}</h1>
@@ -63,6 +66,7 @@ export default function MeetingScheduler() {
                 <button
                   onClick={handlePrevMonth}
                   className="focus:outline-none"
+                  disabled={isLoading}
                 >
                   <ChevronLeftIcon className="h-8 w-8 text-blue-500 bg-blue-200 p-2 rounded-full cursor-pointer" />
                 </button>
@@ -70,6 +74,7 @@ export default function MeetingScheduler() {
                 <button
                   onClick={handleNextMonth}
                   className="focus:outline-none"
+                  disabled={isLoading}
                 >
                   <ChevronRightIcon className="h-8 w-8 text-blue-500 bg-blue-200 p-2 rounded-full cursor-pointer" />
                 </button>
@@ -99,6 +104,7 @@ export default function MeetingScheduler() {
                             ? "bg-blue-500 text-white"
                             : "text-gray-700 hover:bg-gray-200"
                         }`}
+                        disabled={isLoading}
                       >
                         {day}
                       </button>
@@ -113,6 +119,7 @@ export default function MeetingScheduler() {
                     value={selectedTimezone}
                     onChange={setSelectedTimezone}
                     className="text-sm text-gray-600"
+                    isDisabled={isLoading}
                   />
                 </div>
               </div>
@@ -143,6 +150,7 @@ export default function MeetingScheduler() {
                         ? "bg-blue-800 text-white border-blue-800"
                         : "border-blue-500 text-blue-500 hover:bg-blue-50 cursor-pointer"
                     }`}
+                    disabled={isLoading}
                   >
                     {time}
                   </button>
@@ -152,6 +160,7 @@ export default function MeetingScheduler() {
                 text="Continue"
                 className="mt-6 w-[130px]"
                 onClick={handleSchedule}
+                disabled={isLoading}
               />
             </div>
           </div>

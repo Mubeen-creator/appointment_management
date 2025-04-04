@@ -5,6 +5,7 @@ import { setAppointment } from "@/store/slices/appointmentSlice";
 import { useRouter } from "next/navigation";
 import { RootState, useAppDispatch, useAppSelector } from "@/store/store";
 import { timeSlots } from "@/constants/timeSlot";
+
 const useSchedule = () => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
@@ -12,6 +13,7 @@ const useSchedule = () => {
   const [selectedTimezone, setSelectedTimezone] = useState<any>({
     value: "Asia/Karachi",
   });
+  const [isLoading, setIsLoading] = useState(false);
 
   const dispatch = useAppDispatch();
   const router = useRouter();
@@ -59,20 +61,26 @@ const useSchedule = () => {
     setSelectedTime(time);
   };
 
-  const handleSchedule = () => {
+  const handleSchedule = async () => {
     if (selectedDate && selectedTime) {
-      const dateString = selectedDate?.toISOString()?.split("T")[0];
-      dispatch(
-        setAppointment({
-          date: dateString,
-          time: selectedTime,
-          requesterEmail: user?.email,
-          hostEmail: "",
-          message: "",
-        })
-      );
-
-      router.push("/confirm");
+      setIsLoading(true);
+      try {
+        const dateString = selectedDate?.toISOString()?.split("T")[0];
+        dispatch(
+          setAppointment({
+            date: dateString,
+            time: selectedTime,
+            requesterEmail: user?.email,
+            hostEmail: "",
+            message: "",
+          })
+        );
+        await router.push("/confirm");
+      } catch (error) {
+        console.error("Scheduling error:", error);
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 
@@ -85,6 +93,7 @@ const useSchedule = () => {
     setSelectedTime,
     selectedTimezone,
     setSelectedTimezone,
+    isLoading,
     dispatch,
     router,
     user,

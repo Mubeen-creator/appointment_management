@@ -3,14 +3,6 @@ import { useState, useEffect } from "react";
 import { RootState, useAppDispatch, useAppSelector } from "@/store/store";
 import { logout, setUser } from "@/store/slices/userSlice";
 import { useRouter } from "next/navigation";
-import {
-  FiUser,
-  FiPenTool,
-  FiLink,
-  FiLock,
-  FiSettings,
-  FiCalendar,
-} from "react-icons/fi";
 
 const useProfile = () => {
   const user = useAppSelector((state: RootState) => state.user);
@@ -27,6 +19,7 @@ const useProfile = () => {
     user?.profilePicture || null
   );
   const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [showDeletePopup, setShowDeletePopup] = useState(false);
 
   useEffect(() => {
@@ -36,13 +29,16 @@ const useProfile = () => {
   }, [user?.userName, user?.welcomeMessage, user?.profilePicture]);
 
   const handleLogout = () => {
+    setIsLoading(true);
     dispatch(logout());
     router.push("/");
+    setTimeout(() => setIsLoading(false), 500);
   };
 
   useEffect(() => {
     const fetchUserData = async () => {
       if (!user.email) return;
+      setIsLoading(true);
       try {
         const response = await fetch(`/api/get-user?email=${user.email}`);
         if (response.ok) {
@@ -68,12 +64,14 @@ const useProfile = () => {
         console.error("Error fetching user data:", error);
       } finally {
         setLoading(false);
+        setIsLoading(false);
       }
     };
     fetchUserData();
   }, [user.email, dispatch]);
 
   const handleSaveChanges = async () => {
+    setIsLoading(true);
     try {
       const response = await fetch("/api/update-profile", {
         method: "PUT",
@@ -106,12 +104,15 @@ const useProfile = () => {
     } catch (error) {
       console.error("Error updating profile:", error);
       alert("An error occurred while updating the profile.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handlePictureUpload = async (event: any) => {
     const file = event?.target?.files[0];
     if (!file) return;
+    setIsLoading(true);
     const formData = new FormData();
     formData?.append("profilePicture", file);
     formData?.append("email", user.email);
@@ -130,6 +131,8 @@ const useProfile = () => {
     } catch (error) {
       console.error("Error uploading profile picture:", error);
       alert("An error occurred while uploading the profile picture.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -138,6 +141,7 @@ const useProfile = () => {
   };
 
   const confirmDeleteAccount = async () => {
+    setIsLoading(true);
     try {
       const response = await fetch("/api/delete-account", {
         method: "DELETE",
@@ -147,7 +151,7 @@ const useProfile = () => {
       if (response.ok) {
         alert("Account deleted successfully!");
         dispatch(logout());
-        router.push("/");
+        await router.push("/");
       } else {
         alert("Failed to delete account.");
       }
@@ -156,6 +160,7 @@ const useProfile = () => {
       alert("An error occurred while deleting the account.");
     } finally {
       setShowDeletePopup(false);
+      setIsLoading(false);
     }
   };
 
@@ -180,6 +185,7 @@ const useProfile = () => {
     timeZone,
     setTimeZone,
     loading,
+    isLoading,
     profilePicture,
     setProfilePicture,
     showDeletePopup,

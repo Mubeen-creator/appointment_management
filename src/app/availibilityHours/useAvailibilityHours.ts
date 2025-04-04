@@ -5,10 +5,12 @@ import { setUser } from "@/store/slices/userSlice";
 import { useRouter } from "next/navigation";
 import { RootState, useAppDispatch, useAppSelector } from "@/store/store";
 import { useSession } from "next-auth/react";
+
 const useAvailibilityHours = () => {
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
   const [selectedDays, setSelectedDays] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const user = useAppSelector((state: RootState) => state?.user);
   const dispatch = useAppDispatch();
@@ -41,6 +43,7 @@ const useAvailibilityHours = () => {
       return;
     }
 
+    setIsLoading(true);
     try {
       const response = await fetch("/api/availability", {
         method: "POST",
@@ -66,6 +69,8 @@ const useAvailibilityHours = () => {
     } catch (error) {
       console.error("Availability error:", error);
       alert("Connection error");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -76,6 +81,7 @@ const useAvailibilityHours = () => {
     setEndTime,
     selectedDays,
     setSelectedDays,
+    isLoading,
     user,
     dispatch,
     router,

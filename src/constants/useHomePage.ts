@@ -11,6 +11,7 @@ const useHomePage = () => {
   const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
   const [isSignUp, setIsSignUp] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { data: session, status } = useSession();
@@ -29,6 +30,7 @@ const useHomePage = () => {
   }, [session, dispatch]);
 
   const handleSignUp = async () => {
+    setIsLoading(true);
     const userData = { email, fullName, userName, password };
 
     try {
@@ -56,10 +58,13 @@ const useHomePage = () => {
     } catch (error) {
       console.error("Error during sign-up:", error);
       alert("An error occurred. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleSignIn = async () => {
+    setIsLoading(true);
     const signInResponse = await signIn("credentials", {
       redirect: false,
       email,
@@ -71,12 +76,15 @@ const useHomePage = () => {
     } else {
       alert("Invalid credentials.");
     }
+    setIsLoading(false);
   };
 
   const handleSignOut = async () => {
+    setIsLoading(true);
     await signOut({ redirect: false });
     dispatch(logout());
     router.push("/");
+    setIsLoading(false);
   };
 
   return {
@@ -90,6 +98,7 @@ const useHomePage = () => {
     setPassword,
     isSignUp,
     setIsSignUp,
+    isLoading,
     dispatch,
     session,
     status,

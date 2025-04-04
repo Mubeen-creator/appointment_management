@@ -9,6 +9,7 @@ const Dropdown: React.FC<DropdownProps> = ({
   start = false,
   end = false,
   className = "",
+  disabled = false,
 }) => {
   const options = generateTimeOptions(start, end);
   const defaultOption = start

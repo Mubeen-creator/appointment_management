@@ -21,6 +21,7 @@ import DatePicker from "react-datepicker";
 import useDashboard from "./useDashboard";
 import { FiChevronDown } from "react-icons/fi";
 import { datePickerStyles } from "../../constants/timeSlot";
+import Loader from "@/components/loader/Loader";
 
 ChartJS.register(
   CategoryScale,
@@ -47,6 +48,7 @@ export default function ScheduledEvents() {
     setStartDate,
     endDate,
     setEndDate,
+    isLoading,
     dispatch,
     user,
     appointmentsHistory,
@@ -70,13 +72,13 @@ export default function ScheduledEvents() {
   return (
     <div className="flex h-screen relative">
       <style>{datePickerStyles}</style>
+      {isLoading && <Loader />}
       {sidebarOpen && (
         <div
           className="fixed inset-0 bg-gray-300 bg-opacity-50 z-20 md:hidden opacity-25"
           onClick={() => setSidebarOpen(false)}
         ></div>
       )}
-
       <div
         className={`fixed md:relative z-30 h-full transform ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
@@ -87,12 +89,16 @@ export default function ScheduledEvents() {
           <button
             onClick={() => setSidebarOpen(false)}
             className="text-gray-500 hover:text-gray-700"
+            disabled={isLoading}
           >
             <FiChevronLeft size={20} />
           </button>
         </div>
         <div className="p-4" onClick={() => router.push("schedule")}>
-          <button className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-full py-2 px-4 flex items-center justify-center cursor-pointer">
+          <button
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-full py-2 px-4 flex items-center justify-center cursor-pointer"
+            disabled={isLoading}
+          >
             <FiPlus size={16} className="mr-2" /> Create
           </button>
         </div>
@@ -122,6 +128,7 @@ export default function ScheduledEvents() {
                   ? router.push(route)
                   : action === "handleNavigation" && handleNavigation()
               }
+              disabled={isLoading}
             >
               <Icon size={18} className="mr-3" />
               <span className="text-sm font-medium">{name}</span>
@@ -136,6 +143,7 @@ export default function ScheduledEvents() {
               <button
                 onClick={() => setSidebarOpen(true)}
                 className="mr-3 md:hidden text-gray-500 hover:text-gray-700"
+                disabled={isLoading}
               >
                 <FiChevronRight size={20} />
               </button>
@@ -174,6 +182,7 @@ export default function ScheduledEvents() {
                           : "text-gray-500"
                       }`}
                       onClick={() => setActiveTab("Upcoming")}
+                      disabled={isLoading}
                     >
                       Upcoming
                     </button>
@@ -184,6 +193,7 @@ export default function ScheduledEvents() {
                           : "text-gray-500"
                       }`}
                       onClick={() => setActiveTab("Pending")}
+                      disabled={isLoading}
                     >
                       Pending
                     </button>
@@ -194,6 +204,7 @@ export default function ScheduledEvents() {
                           : "text-gray-500"
                       }`}
                       onClick={() => setActiveTab("Past")}
+                      disabled={isLoading}
                     >
                       Past
                     </button>
@@ -204,6 +215,7 @@ export default function ScheduledEvents() {
                           : "text-gray-500"
                       }`}
                       onClick={() => setActiveTab("DateRange")}
+                      disabled={isLoading}
                     >
                       Date Range
                     </button>
@@ -212,11 +224,15 @@ export default function ScheduledEvents() {
                     <button
                       onClick={exportToICS}
                       className="mr-2 px-4 py-1 text-sm border border-gray-800 rounded-full flex items-center hover:bg-gray-50"
+                      disabled={isLoading}
                     >
                       <FiDownload size={16} className="mr-2" />
                       Export
                     </button>
-                    <button className="px-4 py-1 text-sm border border-gray-800 rounded-full flex items-center hover:bg-gray-50">
+                    <button
+                      className="px-4 py-1 text-sm border border-gray-800 rounded-full flex items-center hover:bg-gray-50"
+                      disabled={isLoading}
+                    >
                       <FiFilter size={16} className="mr-2" />
                       Filter
                     </button>
@@ -237,6 +253,7 @@ export default function ScheduledEvents() {
                         endDate={endDate}
                         className="mt-1 p-2 border border-gray-300 rounded-md"
                         placeholderText="Select start date"
+                        disabled={isLoading}
                       />
                     </div>
                     <div>
@@ -250,6 +267,7 @@ export default function ScheduledEvents() {
                         minDate={startDate || undefined}
                         className="mt-1 p-2 border border-gray-300 rounded-md"
                         placeholderText="Select end date"
+                        disabled={isLoading}
                       />
                     </div>
                   </div>
@@ -302,6 +320,7 @@ export default function ScheduledEvents() {
                             <button
                               onClick={() => openModal(appointment)}
                               className="text-blue-600 hover:text-blue-800 text-sm cursor-pointer"
+                              disabled={isLoading}
                             >
                               Details
                             </button>
@@ -385,6 +404,7 @@ export default function ScheduledEvents() {
                         )
                       }
                       className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+                      disabled={isLoading}
                     >
                       Accept
                     </button>
@@ -396,6 +416,7 @@ export default function ScheduledEvents() {
                         )
                       }
                       className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                      disabled={isLoading}
                     >
                       Reject
                     </button>
@@ -404,6 +425,7 @@ export default function ScheduledEvents() {
                         handleUpdateStatus(selectedAppointment?._id!, "pending")
                       }
                       className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+                      disabled={isLoading}
                     >
                       Mark as Pending
                     </button>
@@ -413,6 +435,7 @@ export default function ScheduledEvents() {
                 <button
                   onClick={() => setIsModalOpen(false)}
                   className="mt-4 px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
+                  disabled={isLoading}
                 >
                   Close
                 </button>

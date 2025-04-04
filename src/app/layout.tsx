@@ -1,3 +1,4 @@
+// src/app/layout.tsx
 "use client";
 
 import { Provider } from "react-redux";
@@ -5,11 +6,11 @@ import { store, useAppDispatch } from "../store/store";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { SessionProvider, useSession } from "next-auth/react";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { setUser } from "../store/slices/userSlice";
 import { ToastContainer } from "react-toastify";
-import { usePathname, useSearchParams } from "next/navigation";
-import Loader from "@/components/loader/Loader";
+import RouteChangeHandler from "@/components/routeChangeHandler/RouteChangeHandler";
+import { Suspense } from "react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -46,41 +47,6 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const [isLoading, setIsLoading] = useState(false);
-
-  useEffect(() => {
-    let timeout: NodeJS.Timeout;
-
-    const handleRouteChangeStart = () => {
-      setIsLoading(true);
-    };
-
-    const handleRouteChangeComplete = () => {
-      timeout = setTimeout(() => {
-        setIsLoading(false);
-      }, 3000);
-    };
-
-    window.addEventListener("routeChangeStart", handleRouteChangeStart);
-    window.addEventListener("routeChangeComplete", handleRouteChangeComplete);
-    window.addEventListener("routeChangeError", handleRouteChangeComplete);
-
-    handleRouteChangeStart();
-    timeout = setTimeout(() => setIsLoading(false), 500);
-
-    return () => {
-      window.removeEventListener("routeChangeStart", handleRouteChangeStart);
-      window.removeEventListener(
-        "routeChangeComplete",
-        handleRouteChangeComplete
-      );
-      window.removeEventListener("routeChangeError", handleRouteChangeComplete);
-      clearTimeout(timeout);
-    };
-  }, [pathname, searchParams]);
-
   return (
     <html lang="en">
       <body
@@ -89,8 +55,9 @@ export default function RootLayout({
         <SessionProvider>
           <Provider store={store}>
             <SessionSync />
-            {isLoading && <Loader />}
-            {children}
+            <Suspense fallback={<div>Loading...</div>}>
+              <RouteChangeHandler>{children}</RouteChangeHandler>
+            </Suspense>
             <ToastContainer position="top-right" autoClose={3000} />
           </Provider>
         </SessionProvider>

@@ -199,7 +199,7 @@ const useDashboard = () => {
   });
 
   const exportToICS = () => {
-    setIsLoading(true); // Show loader
+    setIsLoading(true);
     try {
       const icsContent = [
         "BEGIN:VCALENDAR",
@@ -245,7 +245,7 @@ const useDashboard = () => {
     } catch (error) {
       console.error("Error exporting to ICS:", error);
     } finally {
-      setIsLoading(false); // Hide loader
+      setIsLoading(false);
     }
   };
 
@@ -264,7 +264,7 @@ const useDashboard = () => {
     setStartDate,
     endDate,
     setEndDate,
-    isLoading, // Export loading state
+    isLoading,
     dispatch,
     user,
     appointmentsHistory,

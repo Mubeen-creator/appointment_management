@@ -120,9 +120,9 @@ export default function ScheduledEvents() {
         </div>
         <div className="mt-auto px-2 mb-4">
           {bottomOptions?.map(({ name, icon: Icon, route, action }) => (
-            <div
+            <button
               key={name}
-              className="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-md cursor-pointer mt-1"
+              className="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-md cursor-pointer mt-1 w-full text-left"
               onClick={() =>
                 route
                   ? router.push(route)
@@ -132,7 +132,7 @@ export default function ScheduledEvents() {
             >
               <Icon size={18} className="mr-3" />
               <span className="text-sm font-medium">{name}</span>
-            </div>
+            </button>
           ))}
         </div>
       </div>

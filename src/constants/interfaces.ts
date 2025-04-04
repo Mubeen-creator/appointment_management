@@ -27,6 +27,7 @@ export interface InputProps {
 export interface AvailableDaysProps {
   selectedDays: string[];
   setSelectedDays: React.Dispatch<React.SetStateAction<string[]>>;
+  disabled?: boolean;
 }
 
 export interface LoaderProps {

@@ -5,6 +5,7 @@ import { AvailableDaysProps } from "@/constants/interfaces";
 const AvailableDays: React.FC<AvailableDaysProps> = ({
   selectedDays,
   setSelectedDays,
+  disabled,
 }) => {
   const toggleDay = (day: string) => {
     if (selectedDays?.includes(day)) {
